@@ -87,7 +87,7 @@ class SponsorsSlideshowWidget
 		$links = get_bookmarks( array('category' => $category) );
 		if ( $links ) {
 			echo $before_widget . $before_title . $widget_title . $after_title;
-			echo '<div id="sponsors_slideshow_list">';
+			echo '<div id="sponsors_slideshow">';
 			foreach ( $links AS $link ) {
 				echo '<a href="'.$link->link_url.'" target="_blank" title="'.$link->link_name.'"><img src="'.$link->link_image.'" alt="'.$link->link_name.'" /></a>';
 			}
@@ -189,8 +189,8 @@ class SponsorsSlideshowWidget
 			return;
 
 		$widget_ops = array('classname' => 'widget_sponsors_slideshow', 'description' => __('Display specific link category as image slide show', 'sponsors-slideshow') );
-		wp_register_sidebar_widget( 'sponsors_slideshow', 'Sponsors Slideshow', array(&$this, 'display'), $widget_ops );
-		wp_register_widget_control( 'sponsors_slideshow', 'Sponsors Slideshow', array(&$this, 'control'), array('width' => 250, 'height' => 100) );
+		wp_register_sidebar_widget( 'sponsors_slideshow_widget', 'Sponsors Slideshow', array(&$this, 'display'), $widget_ops );
+		wp_register_widget_control( 'sponsors_slideshow_widget', 'Sponsors Slideshow', array(&$this, 'control'), array('width' => 250, 'height' => 100) );
 		return;
 	}
 	
@@ -247,7 +247,7 @@ class SponsorsSlideshowWidget
 		<script type='text/javascript'>
 		//<![CDATA[
 		jQuery(document).ready(function(){
-			jQuery('#sponsors_slideshow_list').slideshow({
+			jQuery('#sponsors_slideshow').slideshow({
 				width: <?php echo $options['width'] ?>,
 				height:<?php echo $options['height']; ?>,
 				time: <?php echo $options['time']*1000; ?>,
