@@ -78,7 +78,7 @@ class SponsorsSlideshowWidget
 			'before_title' => '<h2 class="widgettitle">',
 			'after_title' => '</h2>',
 			'widget_title' => $options['title'],
-			'category' => $options['category']
+			'category' => $options['category'],
 		);
 		
 		$args = array_merge( $defaults, $args );
