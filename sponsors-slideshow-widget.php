@@ -3,7 +3,7 @@
 Plugin Name: Sponsors Slideshow Widget
 Plugin URI: http://wordpress.org/extend/plugins/sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 1.0
+Version: 1.1
 Author: Kolja Schleich
 
 Copyright 2007-2008  Kolja Schleich  (email : kolja.schleich@googlemail.com)
@@ -30,7 +30,7 @@ class SponsorsSlideshowWidget
 	 *
 	 * @var string
 	 */
-	private $version = '1.0';
+	private $version = '1.1';
 	
 	/**
 	 * path to the plugin
@@ -103,7 +103,7 @@ class SponsorsSlideshowWidget
 	 * @param none
 	 * @return void
 	 */
-	public function control( )
+	public function control()
 	{
 		global $wpdb;
 		$options = get_option( 'sponsors_slideshow_widget' );
