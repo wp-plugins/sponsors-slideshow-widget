@@ -120,9 +120,9 @@ class SponsorsSlideshowWidget
 		
 		echo '<div id="sponsors_slideshow_control">';
 		echo '<p><label for="sponsors_slideshow_category">'.__( 'Links', 'sponsors-slideshow' ).'</label> '.$this->linkCategories($options['category']).'</p>';
-		echo '<p><label for="sponsors_slideshow_width">'.__( 'Width', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="sponsors_slideshow_width" id="sponsors_slideshow_width" value="'.$options['width'].'" /> px</p>';
-		echo '<p><label for="sponsors_slideshow_height">'.__( 'Height', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="sponsors_slideshow_height" id="sponsors_slideshow_height" value="'.$options['height'].'" /> px</p>';
-		echo '<p><label for="sponsors_slideshow_time">'.__( 'Time', 'sponsors-slideshow' ).'</label><input type="text" name="sponsors_slideshow_time" id="sponsors_slideshow_time" size="1" value="'.$options['time'].'" /> '.__( 'seconds','sponsors-slideshow').'</p>';
+		echo '<p><label for="sponsors_slideshow_width">'.__( 'Width', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="sponsors_slideshow_width" id="sponsors_slideshow_width" value="'.$options['width'].'" class="widefat" /> px</p>';
+		echo '<p><label for="sponsors_slideshow_height">'.__( 'Height', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="sponsors_slideshow_height" id="sponsors_slideshow_height" value="'.$options['height'].'" class="widefat" /> px</p>';
+		echo '<p><label for="sponsors_slideshow_time">'.__( 'Time', 'sponsors-slideshow' ).'</label><input type="text" name="sponsors_slideshow_time" id="sponsors_slideshow_time" size="1" value="'.$options['time'].'" class="widefat" /> '.__( 'seconds','sponsors-slideshow').'</p>';
 		echo '<p><label for="sponsors_slideshow_fade">'.__( 'Fade Effect', 'sponsors-slideshow' ).'</label>'.$this->fadeEffects($options['fade']).'</p>';
 		echo '<input type="hidden" name="sponsors-slideshow-submit" id="sponsors-slideshow-submit" value="1" />';
 		echo '</div>';
