@@ -28,6 +28,7 @@ div#sponsors_slideshow_control input.widefat { display: inline; clear: none; wid
 
 
 /*--- JQuery Slideshow Styles ---*/
+
 .slideshow, .slideshow-label, .slideshow-content, .slideshow-panel {
 font:12px Verdana, Tahoma, sans-serif;
 }
@@ -159,7 +160,6 @@ padding:2px;
 }
 
 .slideshow-content {
-
 border:1px solid #ccc;
 background-color:#fff;
 color:#333;
