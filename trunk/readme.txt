@@ -14,6 +14,7 @@ This plugin is designed to be used as sponsors slide show widget. It can display
 * set width an height of the slideshow
 * specify time of each image on display
 * choose from twelve different fade effects
+* random or ordered slideshow
 
 The Plugin requires PHP5+!
 

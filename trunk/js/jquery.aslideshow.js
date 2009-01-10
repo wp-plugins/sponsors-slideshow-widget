@@ -30,6 +30,7 @@
         imgcenter:true,       // set image to center // TODO
         imgajax:true,         // load images from links
         linkajax:false,       // load html from links
+	random:false,	// Show Slideshow with random order (by Kolja Schleich <kolja.schleich@googlemail.com>)
         help:'Plugin homepage: <a href="http://slideshow.hohli.com">(a)Slideshow</a><br/>'+
                 'Author homepage: <a href="http://anton.shevchuk.name">Anton Shevchuk</a>',
 
@@ -43,7 +44,7 @@
             'help':true,    // show help message
             'counter':true  // show slide counter
         }
-    };    
+    };
     /**
      * Create a new instance of slideshow.
      *
@@ -389,14 +390,34 @@
              * @method
              */
             this.next = function () {
-                if (this.options.index == (this.length-1)) {
-                    i = 0;
-                } else {
-                    i = this.options.index + 1;
-                }            
+		// random slideshow by Kolja Schleich
+	    	if (this.options.random) {
+			i = this.getRandomNumber();
+		} else {
+			if (this.options.index == (this.length-1)) {
+				i = 0;
+			} else {
+				i = this.options.index + 1;
+			}
+		}
                 this.goSlide(i);
             };
             
+	    
+	    /**
+	     * create random number
+	     * @method
+	     * @author Kolja Schleich <kolja.schleich@googlemail.com>
+	     */
+	    this.getRandomNumber = function () {
+	    	i = Math.floor(Math.random() * (this.length));
+		if ( i == this.options.index ) {
+			this.getRandomNumber();
+		}
+		return i;
+	    }
+	    
+	    
             /**        
              * Init N-slide
              * @method

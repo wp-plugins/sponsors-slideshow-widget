@@ -3,7 +3,7 @@
 Plugin Name: Sponsors Slideshow Widget
 Plugin URI: http://wordpress.org/extend/plugins/sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 1.1
+Version: 1.2
 Author: Kolja Schleich
 
 Copyright 2007-2008  Kolja Schleich  (email : kolja.schleich@googlemail.com)
@@ -30,7 +30,7 @@ class SponsorsSlideshowWidget
 	 *
 	 * @var string
 	 */
-	private $version = '1.1';
+	private $version = '1.2';
 	
 	/**
 	 * path to the plugin
@@ -115,6 +115,7 @@ class SponsorsSlideshowWidget
 			$options['height'] = $_POST['sponsors_slideshow_height'];
 			$options['time'] = $_POST['sponsors_slideshow_time'];
 			$options['fade'] = $_POST['sponsors_slideshow_fade'];
+			$options['random'] = $_POST['sponsors_slideshow_order'];
 			update_option( 'sponsors_slideshow_widget', $options );
 		}
 		
@@ -124,6 +125,7 @@ class SponsorsSlideshowWidget
 		echo '<p><label for="sponsors_slideshow_height">'.__( 'Height', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="sponsors_slideshow_height" id="sponsors_slideshow_height" value="'.$options['height'].'" class="widefat" /> px</p>';
 		echo '<p><label for="sponsors_slideshow_time">'.__( 'Time', 'sponsors-slideshow' ).'</label><input type="text" name="sponsors_slideshow_time" id="sponsors_slideshow_time" size="1" value="'.$options['time'].'" class="widefat" /> '.__( 'seconds','sponsors-slideshow').'</p>';
 		echo '<p><label for="sponsors_slideshow_fade">'.__( 'Fade Effect', 'sponsors-slideshow' ).'</label>'.$this->fadeEffects($options['fade']).'</p>';
+		echo '<p><label for="sponsors_slideshow_order">'.__('Order','sponsors-slideshow').'</label>'.$this->order($options['random']).'</p>';
 		echo '<input type="hidden" name="sponsors-slideshow-submit" id="sponsors-slideshow-submit" value="1" />';
 		echo '</div>';
 		
@@ -178,6 +180,25 @@ class SponsorsSlideshowWidget
 	
 	
 	/**
+	 * order() - dropdown list of Order possibilites
+	 *
+	 * @param string $selected
+	 * @return string
+	 */
+	private function order( $selected )
+	{
+		$order = array(__('Ordered','sponsors-slideshow') => 'false', __('Random','sponsors-slideshow') => 'true');
+		$out = '<select size="1" name="sponsors_slideshow_order" id="sponsors_slideshow_order">';
+		foreach ( $order AS $name => $value ) {
+			$checked =  ( $selected == $value ) ? " selected='selected'" : '';
+			$out .= '<option value="'.$value.'"'.$checked.'>'.$name.'</option>';
+		}
+		$out .= '</select>';
+		return $out;
+	}
+	
+	
+	/**
 	 * register() - registers widget
 	 *
 	 * @param none
@@ -210,6 +231,7 @@ class SponsorsSlideshowWidget
 		$options['height'] = 70;
 		$options['time'] = 3;
 		$options['fade'] = 'fade';
+		$options['random'] = 'false';
 		
 		add_option( 'sponsors_slideshow_widget', $options, 'Sponsors Slideshow Widget Options', 'yes' );
 		
@@ -258,6 +280,7 @@ class SponsorsSlideshowWidget
 				imgresize:true,
 				playframe: false,
 				effect: '<?php echo $options['fade'] ?>',
+				random: <?php echo $options['random'] ?>,
 			});
 		});
 		//]]>
