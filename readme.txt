@@ -3,7 +3,7 @@ Contributors: Kolja Schleich
 Tags: plugin, sidebar, widget, sponsor links, slideshow
 Requires at least: 2.5
 Tested up to: 2.7
-Stable tag: 1.1
+Stable tag: 1.2
 
 Widget to display a certain link category with images as slide show. It needs PHP 5+.
 
