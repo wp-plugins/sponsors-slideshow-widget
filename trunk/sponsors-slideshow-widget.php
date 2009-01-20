@@ -277,7 +277,6 @@ class SponsorsSlideshowWidget
 				panel:false,
 				loop:true,
 				play:true,
-				imgresize:true,
 				playframe: false,
 				effect: '<?php echo $options['fade'] ?>',
 				random: <?php echo $options['random'] ?>,
