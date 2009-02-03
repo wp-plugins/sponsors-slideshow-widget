@@ -39,34 +39,55 @@ class SponsorsSlideshowWidget
 	 */
 	private $plugin_url;
 
-	 
+
 	/**
-	 * Initialize class
+	 * Class Constructor
 	 *
 	 * @param none
 	 * @return void
 	 */
 	public function __construct()
 	{
-		if ( !defined( 'WP_CONTENT_URL' ) )
-			define( 'WP_CONTENT_URL', get_option( 'siteurl' ) . '/wp-content' );
-		if ( !defined( 'WP_PLUGIN_URL' ) )
-			define( 'WP_PLUGIN_URL', WP_CONTENT_URL. '/plugins' );
-		
+		$this->initialize();
 		$this->plugin_url = WP_PLUGIN_URL.'/'.basename(__FILE__, '.php');
-
-		return;
 	}
 
 	
 	/**
-	 * display() - displays Sponsors Slideshow Widget
+	 * initialize plugin: register hooks and actions
+	 *
+	 * @param none
+	 * @return void
+	 */
+	private function initialize()
+	{
+		if ( !defined( 'WP_CONTENT_URL' ) )
+			define( 'WP_CONTENT_URL', get_option( 'siteurl' ) . '/wp-content' );
+		if ( !defined( 'WP_PLUGIN_URL' ) )
+			define( 'WP_PLUGIN_URL', WP_CONTENT_URL. '/plugins' );
+			
+		register_activation_hook(__FILE__, array(&$this, 'activate') );
+		load_plugin_textdomain( 'sponsors-slideshow', false, basename(__FILE__, '.php').'/languages' );
+
+		add_action( 'widets_init', array(&$this, 'register') );
+		add_action( 'admin_head', array(&$this, 'addHeaderCode') );
+		add_action( 'wp_head', array(&$this, 'addHeaderCode') );
+
+		add_filter( 'widget_links_args', array($this, 'widget_links_args') );
+
+		if ( function_exists('register_uninstall_hook') )
+			register_uninstall_hook(__FILE__, array(&$this, 'uninstall'));
+	}
+	
+	
+	/**
+	 * displays Sponsors Slideshow Widget
 	 *
 	 * Usually this function is invoked by the Wordpress widget system.
 	 * However it can also be called manually via sponsors_slideshow_widget_display().
 	 *
 	 * @param array/string $args
-	 * @return null
+	 * @return void
 	 */
 	public function display($args)
 	{
@@ -98,7 +119,7 @@ class SponsorsSlideshowWidget
 
 	
 	/**
-	 * control() - displays control panel for the widget
+	 * displays control panel for the widget
 	 *
 	 * @param none
 	 * @return void
@@ -134,10 +155,10 @@ class SponsorsSlideshowWidget
 
 	
 	/**
-	 * linkCategories() - display link categories as dropdown list
+	 * display link categories as dropdown list
 	 *
-	 * @param int $selected
-	 * @return string
+	 * @param int $selected ID of selected category
+	 * @return select element of categories
 	 */
 	private function linkCategories( $selected )
 	{
@@ -160,10 +181,10 @@ class SponsorsSlideshowWidget
 	
 
 	/**
-	* fadeEffects() - dropdown list
+	* dropdown list of available fade effects
 	*
-	* @param string $selected
-	* @return string
+	* @param string $selected current effect
+	* @return select element of fade effects
 	*/
 	private function fadeEffects( $selected )
 	{
@@ -180,10 +201,10 @@ class SponsorsSlideshowWidget
 	
 	
 	/**
-	 * order() - dropdown list of Order possibilites
+	 * dropdown list of Order possibilites
 	 *
-	 * @param string $selected
-	 * @return string
+	 * @param string $selected current order
+	 * @return order selection
 	 */
 	private function order( $selected )
 	{
@@ -199,7 +220,7 @@ class SponsorsSlideshowWidget
 	
 	
 	/**
-	 * register() - registers widget
+	 * registers widget
 	 *
 	 * @param none
 	 * @return void
@@ -212,12 +233,11 @@ class SponsorsSlideshowWidget
 		$widget_ops = array('classname' => 'widget_sponsors_slideshow', 'description' => __('Display specific link category as image slide show', 'sponsors-slideshow') );
 		wp_register_sidebar_widget( 'sponsors_slideshow_widget', 'Sponsors Slideshow', array(&$this, 'display'), $widget_ops );
 		wp_register_widget_control( 'sponsors_slideshow_widget', 'Sponsors Slideshow', array(&$this, 'control'), array('width' => 250, 'height' => 100) );
-		return;
 	}
 	
 	
 	/**
-	 * activate() - Activate plugin
+	 * Activate plugin
 	 *
 	 * @param none
 	 * @return void
@@ -240,7 +260,7 @@ class SponsorsSlideshowWidget
 
 
 	/**
-	 * uninstall() - uninstall Sponsors Slideshow Widget
+	 * uninstall Sponsors Slideshow Widget
 	 *
 	 * @param none
 	 * @return void
@@ -252,7 +272,7 @@ class SponsorsSlideshowWidget
 
 
 	/**
-	 * addHeaderCode() - adds code to Wordpress head
+	 * adds code to Wordpress head
 	 *
 	 * @param none
 	 * @return void
@@ -302,20 +322,8 @@ class SponsorsSlideshowWidget
 	 }
 }
 
+// Rund SponsorsSlideshowWidget
 $sponsors_slideshow_widget = new SponsorsSlideshowWidget();
-
-register_activation_hook(__FILE__, array(&$sponsors_slideshow_widget, 'activate') );
-load_plugin_textdomain( 'sponsors-slideshow', false, basename(__FILE__, '.php').'/languages' );
-
-add_action( 'widgets_init', array(&$sponsors_slideshow_widget, 'register') );
-add_action( 'admin_head', array(&$sponsors_slideshow_widget, 'addHeaderCode') );
-add_action( 'wp_head', array(&$sponsors_slideshow_widget, 'addHeaderCode') );
-
-add_filter( 'widget_links_args', array($sponsors_slideshow_widget, 'widget_links_args') );
-
-if ( function_exists('register_uninstall_hook') )
-	register_uninstall_hook(__FILE__, array(&$sponsors_slideshow_widget, 'uninstall'));
-
 
 /**
  * Wrapper function to display Sponsors Slideshow Widget statically
