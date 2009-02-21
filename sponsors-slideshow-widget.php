@@ -3,7 +3,7 @@
 Plugin Name: Sponsors Slideshow Widget
 Plugin URI: http://wordpress.org/extend/plugins/sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 1.2
+Version: 1.3
 Author: Kolja Schleich
 
 Copyright 2007-2008  Kolja Schleich  (email : kolja.schleich@googlemail.com)
@@ -30,14 +30,14 @@ class SponsorsSlideshowWidget
 	 *
 	 * @var string
 	 */
-	private $version = '1.2';
+	var $version = '1.3';
 	
 	/**
 	 * path to the plugin
 	 *
 	 * @var string
 	 */
-	private $plugin_url;
+	var $plugin_url;
 
 
 	/**
@@ -46,20 +46,7 @@ class SponsorsSlideshowWidget
 	 * @param none
 	 * @return void
 	 */
-	public function __construct()
-	{
-		$this->initialize();
-		$this->plugin_url = WP_PLUGIN_URL.'/'.basename(__FILE__, '.php');
-	}
-
-	
-	/**
-	 * initialize plugin: register hooks and actions
-	 *
-	 * @param none
-	 * @return void
-	 */
-	private function initialize()
+	function __construct()
 	{
 		if ( !defined( 'WP_CONTENT_URL' ) )
 			define( 'WP_CONTENT_URL', get_option( 'siteurl' ) . '/wp-content' );
@@ -69,7 +56,7 @@ class SponsorsSlideshowWidget
 		register_activation_hook(__FILE__, array(&$this, 'activate') );
 		load_plugin_textdomain( 'sponsors-slideshow', false, basename(__FILE__, '.php').'/languages' );
 
-		add_action( 'widets_init', array(&$this, 'register') );
+		add_action( 'init', array(&$this, 'register') );
 		add_action( 'admin_head', array(&$this, 'addHeaderCode') );
 		add_action( 'wp_head', array(&$this, 'addHeaderCode') );
 
@@ -77,6 +64,12 @@ class SponsorsSlideshowWidget
 
 		if ( function_exists('register_uninstall_hook') )
 			register_uninstall_hook(__FILE__, array(&$this, 'uninstall'));
+			
+		$this->plugin_url = WP_PLUGIN_URL.'/'.basename(__FILE__, '.php');
+	}
+	function SponsorsSlideshowWidget()
+	{
+		$this->__construct();
 	}
 	
 	
@@ -89,7 +82,7 @@ class SponsorsSlideshowWidget
 	 * @param array/string $args
 	 * @return void
 	 */
-	public function display($args)
+	function display($args)
 	{
 		$options = get_option( 'sponsors_slideshow_widget' );
 
@@ -124,7 +117,7 @@ class SponsorsSlideshowWidget
 	 * @param none
 	 * @return void
 	 */
-	public function control()
+	function control()
 	{
 		global $wpdb;
 		$options = get_option( 'sponsors_slideshow_widget' );
@@ -160,7 +153,7 @@ class SponsorsSlideshowWidget
 	 * @param int $selected ID of selected category
 	 * @return select element of categories
 	 */
-	private function linkCategories( $selected )
+	function linkCategories( $selected )
 	{
 		$categories = get_terms('link_category', 'orderby=name&hide_empty=0');
 	
@@ -186,7 +179,7 @@ class SponsorsSlideshowWidget
 	* @param string $selected current effect
 	* @return select element of fade effects
 	*/
-	private function fadeEffects( $selected )
+	function fadeEffects( $selected )
 	{
 		$effects = array(__('Fade','sponsors-slideshow') => 'fade', __('Zoom Fade','sponsors-slideshow') => 'zoomFade', __('Scroll Up','sponsors-slideshow') => 'scrollUp', __('Scroll Left','sponsors-slideshow') => 'scrollLeft', __('Scroll Right','sponsors-slideshow') => 'scrollRight', __('Scroll Down','sponsors-slideshow') => 'scrollDown', __( 'Zoom','sponsors-slideshow') => 'zoom', __('Grow X','sponsors-slideshow') => 'growX', __('Grow Y','sponsors-slideshow') => 'growY', __('Zoom BR','sponsors-slideshow') => 'zoomBR', __('Zoom TL','sponsors-slideshow') => 'zoomTL', __('Random','sponsors-slideshow') => 'random');
 		
@@ -206,7 +199,7 @@ class SponsorsSlideshowWidget
 	 * @param string $selected current order
 	 * @return order selection
 	 */
-	private function order( $selected )
+	function order( $selected )
 	{
 		$order = array(__('Ordered','sponsors-slideshow') => 'false', __('Random','sponsors-slideshow') => 'true');
 		$out = '<select size="1" name="sponsors_slideshow_order" id="sponsors_slideshow_order">';
@@ -225,7 +218,7 @@ class SponsorsSlideshowWidget
 	 * @param none
 	 * @return void
 	 */
-	public function register()
+	function register()
 	{
 		if ( !function_exists("register_sidebar_widget") )
 			return;
@@ -242,7 +235,7 @@ class SponsorsSlideshowWidget
 	 * @param none
 	 * @return void
 	 */
-	public function activate()
+	function activate()
 	{		
 		$options = array();
 		$options['title'] = '';
@@ -265,7 +258,7 @@ class SponsorsSlideshowWidget
 	 * @param none
 	 * @return void
 	 */
-	public function uninstall()
+	function uninstall()
 	{
 		delete_option( 'sponsors_slideshow_widget' );
 	}
@@ -277,7 +270,7 @@ class SponsorsSlideshowWidget
 	 * @param none
 	 * @return void
 	 */
-	public function addHeaderCode()
+	function addHeaderCode()
 	{
 		$options = get_option('sponsors_slideshow_widget');
 		
@@ -314,7 +307,7 @@ class SponsorsSlideshowWidget
 	 * @param $args
 	 * @return array
 	 */
-	 public function widget_links_args( $args )
+	 function widget_links_args( $args )
 	 {
 		$options = get_option('sponsors_slideshow_widget');
 		$args['exclude_category'] = $options['category'];
