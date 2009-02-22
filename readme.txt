@@ -17,6 +17,8 @@ This plugin is designed to be used as sponsors slide show widget. It can display
 * choose from twelve different fade effects
 * random or ordered slideshow
 
+Due to the growing popularity of my plugins I have launched a [website](http://kolja.galerie-neander.de/)!
+
 **Version 1.3 is PHP4 compatible.**
 
 == Installation ==
