@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: plugin, sidebar, widget, sponsor links, slideshow
 Requires at least: 2.7
 Tested up to: 2.7.1
-Stable tag: 1.3.1
+Stable tag: 1.4
 
 Widget to display a certain link category with images as slide show.
 
@@ -16,10 +16,11 @@ This plugin is designed to be used as sponsors slide show widget. It can display
 * specify time of each image on display
 * choose from twelve different fade effects
 * random or ordered slideshow
+* multiple widget support
 
 Due to the growing popularity of my plugins I have launched a [website](http://kolja.galerie-neander.de/)!
 
-**Version 1.3 is PHP4 compatible.**
+**Version 1.3+ is PHP4 compatible.**
 
 == Installation ==
 
@@ -28,3 +29,9 @@ To install the plugin to the following steps
 1. Unzip the zip-file and upload the content to your Wordpress Plugin directory.
 2. Activiate the plugin via the admin plugin page.
 3. Go to the widget page and add it to your sidebar.
+
+== ChangeLog ==
+
+V.1.4 - April 8, 2009
+* NEW: multiple widget support
+* BUGFIX: centering of slideshow

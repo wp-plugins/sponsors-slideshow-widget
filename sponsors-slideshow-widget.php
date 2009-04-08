@@ -4,7 +4,7 @@ Plugin Name: Sponsors Slideshow Widget
 Author URI: http://kolja.galerie-neander.de/
 Plugin URI: http://kolja.galerie-neander.de/plugins/#sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 1.3.1
+Version: 1.4
 Author: Kolja Schleich
 
 Copyright 2007-2008  Kolja Schleich  (email : kolja.schleich@googlemail.com)
@@ -31,7 +31,7 @@ class SponsorsSlideshowWidget
 	 *
 	 * @var string
 	 */
-	var $version = '1.3.1';
+	var $version = '1.4';
 	
 	/**
 	 * path to the plugin
@@ -41,6 +41,14 @@ class SponsorsSlideshowWidget
 	var $plugin_url;
 
 
+	/**
+	 * prefix of widget
+	 * 
+	 * @var string
+	 */
+	var $prefix = 'sponsors-slideshow-widget';
+	
+	
 	/**
 	 * Class Constructor
 	 *
@@ -75,18 +83,53 @@ class SponsorsSlideshowWidget
 	
 	
 	/**
+	 * registers widget
+	 *
+	 * @param none
+	 * @return void
+	 */
+	function register()
+	{
+		if ( !function_exists("wp_register_sidebar_widget") )
+			return;
+
+		$name = __('Sponsors Slideshow', 'sponsors-slideshow');
+		$widget_ops = array('classname' => 'sponsors_slideshow_widget', 'description' => __('Display specific link category as image slide show', 'sponsors-slideshow') );
+		$control_ops = array('width' => 200, 'height' => 200, 'id_base' => $this->prefix);
+		
+		$options = get_option('sponsors_slideshow_widget');
+		unset($options['version']);
+		if (isset($options[0])) unset($options[0]);
+		
+		if ( !empty($options)) {
+			foreach(array_keys($options) AS $widget_number) {
+				wp_register_sidebar_widget($this->prefix.'-'.$widget_number, $name, array(&$this, 'display'), $widget_ops, array('number' => $widget_number));
+				wp_register_widget_control($this->prefix.'-'.$widget_number, $name, array(&$this, 'control'), $control_ops, array('number' => $widget_number));
+			}
+		} else {
+			$options = array();
+			$widget_number = 1;
+			wp_register_sidebar_widget($this->prefix.'-'.$widget_number, $name, array(&$this, 'display'), $widget_ops, array('number' => $widget_number));
+			wp_register_widget_control($this->prefix.'-'.$widget_number, $name, array(&$this, 'control'), $control_ops, array('number' => $widget_number));
+		}
+	}
+	
+	
+	/**
 	 * displays Sponsors Slideshow Widget
 	 *
 	 * Usually this function is invoked by the Wordpress widget system.
 	 * However it can also be called manually via sponsors_slideshow_widget_display().
 	 *
-	 * @param array/string $args
+	 * @param array $args
+	 * @param array $args1
 	 * @return void
 	 */
-	function display($args)
+	function display($args, $args1)
 	{
 		$options = get_option( 'sponsors_slideshow_widget' );
-
+		$options = $options[$args1['number']];
+		
 		$defaults = array(
 			'before_widget' => '<li id="sponsors_slideshow_widget" class="widget '.get_class($this).'_'.__FUNCTION__.'">',
 			'after_widget' => '</li>',
@@ -101,8 +144,28 @@ class SponsorsSlideshowWidget
 			
 		$links = get_bookmarks( array('category' => $category) );
 		if ( $links ) {
+			?>
+			<script type='text/javascript'>
+			//<![CDATA[
+			jQuery(document).ready(function(){
+				jQuery('#sponsors_slideshow_<?php echo $args1['number'] ?>').slideshow({
+					width: <?php echo $options['width'] ?>,
+					height:<?php echo $options['height']; ?>,
+					time: <?php echo $options['time']*1000; ?>,
+					title:false,
+					panel:false,
+					loop:true,
+					play:true,
+					playframe: false,
+					effect: '<?php echo $options['fade'] ?>',
+					random: <?php echo $options['order'] ?>
+				});
+			});
+			//]]>
+			</script>
+			<?php
 			echo $before_widget . $before_title . $widget_title . $after_title;
-			echo '<div id="sponsors_slideshow">';
+			echo '<div id="sponsors_slideshow_'.$args1['number'].'" class="sponsors_slideshow">';
 			foreach ( $links AS $link ) {
 				echo '<a href="'.$link->link_url.'" target="_blank" title="'.$link->link_name.'"><img src="'.$link->link_image.'" alt="'.$link->link_name.'" /></a>';
 			}
@@ -115,33 +178,53 @@ class SponsorsSlideshowWidget
 	/**
 	 * displays control panel for the widget
 	 *
-	 * @param none
+	 * @param array $args
 	 * @return void
 	 */
-	function control()
+	function control($args)
 	{
 		global $wpdb;
-		$options = get_option( 'sponsors_slideshow_widget' );
-		if ( $_POST['sponsors-slideshow-submit'] ) {
-			$categories = $wpdb->get_results( "SELECT name FROM $wpdb->terms WHERE `term_id` = {$_POST['sponsors_slideshow_category']}" );
-			$options['title'] = wp_specialchars($categories[0]->name);
-			$options['category'] = $_POST['sponsors_slideshow_category'];
-			$options['width'] = $_POST['sponsors_slideshow_width'];
-			$options['height'] = $_POST['sponsors_slideshow_height'];
-			$options['time'] = $_POST['sponsors_slideshow_time'];
-			$options['fade'] = $_POST['sponsors_slideshow_fade'];
-			$options['random'] = $_POST['sponsors_slideshow_order'];
-			update_option( 'sponsors_slideshow_widget', $options );
-		}
 		
-		echo '<div id="sponsors_slideshow_control">';
-		echo '<p><label for="sponsors_slideshow_category">'.__( 'Links', 'sponsors-slideshow' ).'</label> '.$this->linkCategories($options['category']).'</p>';
-		echo '<p><label for="sponsors_slideshow_width">'.__( 'Width', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="sponsors_slideshow_width" id="sponsors_slideshow_width" value="'.$options['width'].'" class="widefat" /> px</p>';
-		echo '<p><label for="sponsors_slideshow_height">'.__( 'Height', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="sponsors_slideshow_height" id="sponsors_slideshow_height" value="'.$options['height'].'" class="widefat" /> px</p>';
-		echo '<p><label for="sponsors_slideshow_time">'.__( 'Time', 'sponsors-slideshow' ).'</label><input type="text" name="sponsors_slideshow_time" id="sponsors_slideshow_time" size="1" value="'.$options['time'].'" class="widefat" /> '.__( 'seconds','sponsors-slideshow').'</p>';
-		echo '<p><label for="sponsors_slideshow_fade">'.__( 'Fade Effect', 'sponsors-slideshow' ).'</label>'.$this->fadeEffects($options['fade']).'</p>';
-		echo '<p><label for="sponsors_slideshow_order">'.__('Order','sponsors-slideshow').'</label>'.$this->order($options['random']).'</p>';
-		echo '<input type="hidden" name="sponsors-slideshow-submit" id="sponsors-slideshow-submit" value="1" />';
+		$options = get_option( 'sponsors_slideshow_widget' );
+		if(empty($options)) $options = array();
+		if(isset($options[0])) unset($options[0]);
+		
+		if(isset($_POST) && !empty($_POST[$this->prefix]) && is_array($_POST)) {
+			foreach($_POST[$this->prefix] as $widget_number => $values){
+				if(empty($values) && isset($options[$widget_number])) // user clicked cancel
+					continue;
+			
+				if(!isset($options[$widget_number]) && $args['number'] == -1){
+					$args['number'] = $widget_number;
+					$options['last_number'] = $widget_number;
+				}
+				$categories = $wpdb->get_results( "SELECT name FROM $wpdb->terms WHERE `term_id` = {$values['category']}" );
+				$values['title'] = wp_specialchars($categories[0]->name);
+				$options[$widget_number] = $values;	
+			}
+			// update number
+			if($args['number'] == -1 && !empty($options['last_number'])){
+				$args['number'] = $options['last_number'];
+			}
+			// clear unused options and update options in DB. return actual options array
+			$options = $this->updateOptions($this->prefix, $options, $_POST[$this->prefix], $_POST['sidebar'], 'sponsors_slideshow_widget');
+		}
+		/* $number - is dynamic number for multi widget, given by WP
+		 * by default $number = -1 (if no widgets activated). In this case we should use %i% for inputs
+		 * to allow WP generate number automatically
+		 */
+		$number = ($args['number'] == -1)? '%i%' : $args['number'];
+ 
+		// now we can output control
+		$opts = @$options[$number];
+		
+		echo '<div id="sponsors_slideshow_control_'.$number.'" class="sponsors_slideshow_control">';
+		echo '<p><label for="'.$this->prefix.'_'.$number.'_category">'.__( 'Links', 'sponsors-slideshow' ).'</label> '.$this->linkCategories($opts['category'], $number).'</p>';
+		echo '<p><label for="'.$this->prefix.'_'.$number.'_width">'.__( 'Width', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="'.$this->prefix.'['.$number.'][width]" id="'.$this->prefix.'_'.$number.'_width" value="'.$opts['width'].'" /> px</p>';
+		echo '<p><label for="'.$this->prefix.'_'.$number.'_height">'.__( 'Height', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="'.$this->prefix.'['.$number.'][height]" id="'.$this->prefix.'_'.$number.'_height" value="'.$opts['height'].'" /> px</p>';
+		echo '<p><label for="'.$this->prefix.'_'.$number.'_time">'.__( 'Time', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->prefix.'['.$number.'][time]" id="'.$this->prefix.'_'.$number.'_time" size="1" value="'.$opts['time'].'" /> '.__( 'seconds','sponsors-slideshow').'</p>';
+		echo '<p><label for="'.$this->prefix.'_'.$number.'_fade">'.__( 'Fade Effect', 'sponsors-slideshow' ).'</label>'.$this->fadeEffects($opts['fade'], $number).'</p>';
+		echo '<p><label for="'.$this->prefix.'_'.$number.'_order">'.__('Order','sponsors-slideshow').'</label>'.$this->order($opts['random'], $number).'</p>';
 		echo '</div>';
 		
 		return;
@@ -149,19 +232,61 @@ class SponsorsSlideshowWidget
 
 	
 	/**
+	 * Universal update helper
+	 *
+	 */
+	function updateOptions($id_prefix, $options, $post, $sidebar, $option_name = '')
+	{
+		global $wp_registered_widgets;
+		static $updated = false;
+		
+		// get active sidebar
+		$sidebars_widgets = wp_get_sidebars_widgets();
+		if ( isset($sidebars_widgets[$sidebar]) )
+			$this_sidebar =& $sidebars_widgets[$sidebar];
+		else
+			$this_sidebar = array();
+
+		// search unused options
+		foreach ( $this_sidebar as $_widget_id ) {
+			if(preg_match('/'.$id_prefix.'-([0-9]+)/i', $_widget_id, $match)){
+				$widget_number = $match[1];
+ 
+				// $_POST['widget-id'] contain current widgets set for current sidebar
+				// $this_sidebar is not updated yet, so we can determine which was deleted
+				if(!in_array($match[0], $_POST['widget-id'])){
+					unset($options[$widget_number]);
+				}
+			}
+		}
+			
+		// update database
+		if(!empty($option_name)){
+			$options['version'] = $this->version;
+			update_option($option_name, $options);
+			$updated = true;
+		}
+		
+		// return updated array
+		return $options;
+	}
+	
+	
+	/**
 	 * display link categories as dropdown list
 	 *
 	 * @param int $selected ID of selected category
+	 * @param int $number widget number
 	 * @return select element of categories
 	 */
-	function linkCategories( $selected )
+	function linkCategories( $selected, $number )
 	{
 		$categories = get_terms('link_category', 'orderby=name&hide_empty=0');
 	
 		if ( empty($categories) )
 			return;
 	
-		$out = '<select size="1" name="sponsors_slideshow_category" id="sponsors_slideshow_category">';
+		$out = '<select size="1" name="'.$this->prefix.'['.$number.'][category]" id="'.$this->prefix.'_'.$number.'_category">';
 		foreach ( $categories as $category ) {
 			$cat_id = $category->term_id;
 			$name = wp_specialchars( apply_filters('the_category', $category->name));
@@ -178,13 +303,14 @@ class SponsorsSlideshowWidget
 	* dropdown list of available fade effects
 	*
 	* @param string $selected current effect
+	* @param int $number widget number
 	* @return select element of fade effects
 	*/
-	function fadeEffects( $selected )
+	function fadeEffects( $selected, $number )
 	{
 		$effects = array(__('Fade','sponsors-slideshow') => 'fade', __('Zoom Fade','sponsors-slideshow') => 'zoomFade', __('Scroll Up','sponsors-slideshow') => 'scrollUp', __('Scroll Left','sponsors-slideshow') => 'scrollLeft', __('Scroll Right','sponsors-slideshow') => 'scrollRight', __('Scroll Down','sponsors-slideshow') => 'scrollDown', __( 'Zoom','sponsors-slideshow') => 'zoom', __('Grow X','sponsors-slideshow') => 'growX', __('Grow Y','sponsors-slideshow') => 'growY', __('Zoom BR','sponsors-slideshow') => 'zoomBR', __('Zoom TL','sponsors-slideshow') => 'zoomTL', __('Random','sponsors-slideshow') => 'random');
 		
-		$out = '<select size="1" name="sponsors_slideshow_fade" id="sponsors_slideshow_fade">';
+		$out = '<select size="1" name="'.$this->prefix.'['.$number.'][fade]" id="'.$this->prefix.'_'.$number.'_fade">';
 		foreach ( $effects AS $name => $effect ) {
 			$checked =  ( $selected == $effect ) ? " selected='selected'" : '';
 			$out .= '<option value="'.$effect.'"'.$checked.'>'.$name.'</option>';
@@ -198,12 +324,13 @@ class SponsorsSlideshowWidget
 	 * dropdown list of Order possibilites
 	 *
 	 * @param string $selected current order
+	 * @param int $number widget number
 	 * @return order selection
 	 */
-	function order( $selected )
+	function order( $selected, $number )
 	{
 		$order = array(__('Ordered','sponsors-slideshow') => 'false', __('Random','sponsors-slideshow') => 'true');
-		$out = '<select size="1" name="sponsors_slideshow_order" id="sponsors_slideshow_order">';
+		$out = '<select size="1" name="'.$this->prefix.'['.$number.'][order]" id="'.$this->prefix.'_'.$number.'_order">';
 		foreach ( $order AS $name => $value ) {
 			$checked =  ( $selected == $value ) ? " selected='selected'" : '';
 			$out .= '<option value="'.$value.'"'.$checked.'>'.$name.'</option>';
@@ -211,24 +338,7 @@ class SponsorsSlideshowWidget
 		$out .= '</select>';
 		return $out;
 	}
-	
-	
-	/**
-	 * registers widget
-	 *
-	 * @param none
-	 * @return void
-	 */
-	function register()
-	{
-		if ( !function_exists("register_sidebar_widget") )
-			return;
 
-		$widget_ops = array('classname' => 'widget_sponsors_slideshow', 'description' => __('Display specific link category as image slide show', 'sponsors-slideshow') );
-		wp_register_sidebar_widget( 'sponsors_slideshow_widget', 'Sponsors Slideshow', array(&$this, 'display'), $widget_ops );
-		wp_register_widget_control( 'sponsors_slideshow_widget', 'Sponsors Slideshow', array(&$this, 'control'), array('width' => 250, 'height' => 100) );
-	}
-	
 	
 	/**
 	 * Activate plugin
@@ -239,13 +349,7 @@ class SponsorsSlideshowWidget
 	function activate()
 	{		
 		$options = array();
-		$options['title'] = '';
 		$options['version'] = $this->version;
-		$options['width'] = 140;
-		$options['height'] = 70;
-		$options['time'] = 3;
-		$options['fade'] = 'fade';
-		$options['random'] = 'false';
 		
 		add_option( 'sponsors_slideshow_widget', $options, 'Sponsors Slideshow Widget Options', 'yes' );
 		
@@ -273,32 +377,9 @@ class SponsorsSlideshowWidget
 	 */
 	function addHeaderCode()
 	{
-		$options = get_option('sponsors_slideshow_widget');
-		
 		echo "<link rel='stylesheet' href='".$this->plugin_url."/style.css' type='text/css' />\n";
 		wp_register_script( 'jquery_slideshow', $this->plugin_url.'/js/jquery.aslideshow.js', array('jquery'), '0.5.3' );
 		wp_print_scripts( 'jquery_slideshow' );
-		
-		?>
-		<script type='text/javascript'>
-		//<![CDATA[
-		jQuery(document).ready(function(){
-			jQuery('#sponsors_slideshow').slideshow({
-				width: <?php echo $options['width'] ?>,
-				height:<?php echo $options['height']; ?>,
-				time: <?php echo $options['time']*1000; ?>,
-				title:false,
-				panel:false,
-				loop:true,
-				play:true,
-				playframe: false,
-				effect: '<?php echo $options['fade'] ?>',
-				random: <?php echo $options['random'] ?>
-			});
-		});
-		//]]>
-		</script>
-		<?php
 	}
 	
 	
@@ -315,7 +396,6 @@ class SponsorsSlideshowWidget
 		return $args;
 	 }
 }
-
 // Rund SponsorsSlideshowWidget
 $sponsors_slideshow_widget = new SponsorsSlideshowWidget();
 
@@ -327,4 +407,4 @@ $sponsors_slideshow_widget = new SponsorsSlideshowWidget();
 function sponsors_slideshow_widget_display( $args = array() ) {
 	global $sponsors_slideshow_widget;
 	$sponsors_slideshow_widget->display( $args );
- }
+}
