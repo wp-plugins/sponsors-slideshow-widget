@@ -1,0 +1,30 @@
+=== Sponsors Slideshow Widget ===
+Contributors: Kolja Schleich
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2329191
+Tags: plugin, sidebar, widget, sponsor links, slideshow
+Requires at least: 2.7
+Tested up to: 2.7.1
+Stable tag: 1.3.1
+
+Widget to display a certain link category with images as slide show.
+
+== Description ==
+
+This plugin is designed to be used as sponsors slide show widget. It can display a certain link category as slide show in the sidebar, using jQuery. It automatically excludes the chosen slideshow category from the Wordpress internal links widget. Below is a list of options.
+
+* set width an height of the slideshow
+* specify time of each image on display
+* choose from twelve different fade effects
+* random or ordered slideshow
+
+Due to the growing popularity of my plugins I have launched a [website](http://kolja.galerie-neander.de/)!
+
+**Version 1.3 is PHP4 compatible.**
+
+== Installation ==
+
+To install the plugin to the following steps
+
+1. Unzip the zip-file and upload the content to your Wordpress Plugin directory.
+2. Activiate the plugin via the admin plugin page.
+3. Go to the widget page and add it to your sidebar.
