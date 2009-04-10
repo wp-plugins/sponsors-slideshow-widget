@@ -55,7 +55,7 @@ display:none; /* Set to "none" for not preview slideshow content */
 
 .slideshow-content {
 /*border:1px solid #ccc;*/
-background-color:#fff;
+background-color:transparent;
 color:#333;
 overflow:hidden;
 position:relative;
