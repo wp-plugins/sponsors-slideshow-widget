@@ -33,5 +33,6 @@ To install the plugin to the following steps
 == ChangeLog ==
 
 V.1.4 - April 8, 2009
+
 * NEW: multiple widget support
 * BUGFIX: centering of slideshow
