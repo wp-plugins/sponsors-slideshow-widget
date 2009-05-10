@@ -147,22 +147,19 @@ class SponsorsSlideshowWidget
 			?>
 			<script type='text/javascript'>
 			//<![CDATA[
-			jQuery(document).ready(function(){
-				jQuery('#sponsors_slideshow_<?php echo $args1['number'] ?>').slideshow({
-					width: <?php echo $options['width'] ?>,
-					height:<?php echo $options['height']; ?>,
-					time: <?php echo $options['time']*1000; ?>,
-					title:false,
-					panel:false,
-					loop:true,
-					play:true,
-					playframe: false,
-					effect: '<?php echo $options['fade'] ?>',
-					random: <?php echo $options['order'] ?>
-				});
+			jQuery('#sponsors_slideshow_<?php echo $args1['number'] ?>').cycle({
+				timeout: <?php echo $options['time']*1000; ?>,
+				fx: '<?php echo $options['fade'] ?>',
+				random: <?php echo $options['order'] ?>
 			});
 			//]]>
 			</script>
+			<style type="text/css">
+				div#sponsors_slideshow_<?php echo $args1['number'] ?> {
+					width: <?php echo $options['width'] ?>px;
+					height:<?php echo $options['height']; ?>px;
+				}
+			</style>
 			<?php
 			echo $before_widget . $before_title . $widget_title . $after_title;
 			echo '<div id="sponsors_slideshow_'.$args1['number'].'" class="sponsors_slideshow">';
@@ -308,7 +305,7 @@ class SponsorsSlideshowWidget
 	*/
 	function fadeEffects( $selected, $number )
 	{
-		$effects = array(__('Fade','sponsors-slideshow') => 'fade', __('Zoom Fade','sponsors-slideshow') => 'zoomFade', __('Scroll Up','sponsors-slideshow') => 'scrollUp', __('Scroll Left','sponsors-slideshow') => 'scrollLeft', __('Scroll Right','sponsors-slideshow') => 'scrollRight', __('Scroll Down','sponsors-slideshow') => 'scrollDown', __( 'Zoom','sponsors-slideshow') => 'zoom', __('Grow X','sponsors-slideshow') => 'growX', __('Grow Y','sponsors-slideshow') => 'growY', __('Zoom BR','sponsors-slideshow') => 'zoomBR', __('Zoom TL','sponsors-slideshow') => 'zoomTL', __('Random','sponsors-slideshow') => 'random');
+		$effects = array(__('Fade','sponsors-slideshow') => 'fade', __('Zoom Fade','sponsors-slideshow') => 'fadeZoom', __('Scroll Up','sponsors-slideshow') => 'scrollUp', __('Scroll Left','sponsors-slideshow') => 'scrollLeft', __('Scroll Right','sponsors-slideshow') => 'scrollRight', __('Scroll Down','sponsors-slideshow') => 'scrollDown', __('Scroll Horizontal', 'sponsors-slideshow') => 'scrollHorz', __('Scroll Vertical', 'sponsors-slideshow') => 'scrotllVert', __( 'Zoom','sponsors-slideshow') => 'zoom', __('Grow X','sponsors-slideshow') => 'growX', __('Grow Y','sponsors-slideshow') => 'growY', __('Zoom BR','sponsors-slideshow') => 'zoomBR', __('Zoom TL','sponsors-slideshow') => 'zoomTL', __('Random','sponsors-slideshow') => 'random');
 		
 		$out = '<select size="1" name="'.$this->prefix.'['.$number.'][fade]" id="'.$this->prefix.'_'.$number.'_fade">';
 		foreach ( $effects AS $name => $effect ) {
@@ -329,7 +326,7 @@ class SponsorsSlideshowWidget
 	 */
 	function order( $selected, $number )
 	{
-		$order = array(__('Ordered','sponsors-slideshow') => 'false', __('Random','sponsors-slideshow') => 'true');
+		$order = array(__('Ordered','sponsors-slideshow') => '0', __('Random','sponsors-slideshow') => '1');
 		$out = '<select size="1" name="'.$this->prefix.'['.$number.'][order]" id="'.$this->prefix.'_'.$number.'_order">';
 		foreach ( $order AS $name => $value ) {
 			$checked =  ( $selected == $value ) ? " selected='selected'" : '';
@@ -378,7 +375,7 @@ class SponsorsSlideshowWidget
 	function addHeaderCode()
 	{
 		echo "<link rel='stylesheet' href='".$this->plugin_url."/style.css' type='text/css' />\n";
-		wp_register_script( 'jquery_slideshow', $this->plugin_url.'/js/jquery.aslideshow.js', array('jquery'), '0.5.3' );
+		wp_register_script( 'jquery_slideshow', $this->plugin_url.'/js/jquery.cycle.all.js', array('jquery'), '2.65' );
 		wp_print_scripts( 'jquery_slideshow' );
 	}
 	
