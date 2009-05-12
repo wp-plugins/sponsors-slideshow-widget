@@ -10,15 +10,14 @@ Widget to display a certain link category with images as slide show.
 
 == Description ==
 
-This plugin is designed to be used as sponsors slide show widget. It can display a certain link category as slide show in the sidebar, using jQuery. It automatically excludes the chosen slideshow category from the Wordpress internal links widget. Below is a list of options.
+This plugin is designed to be used as sponsors slide show widget. It can display a certain link category as slide show in the sidebar, using the [jQuery Cycle Plugin](http://malsup.com/jquery/cycle). It automatically excludes the chosen slideshow category from the Wordpress internal links widget. Below is a list of options.
 
 * set width an height of the slideshow
 * specify time of each image on display
-* choose from twelve different fade effects
+* choose from several different fade effects
 * random or ordered slideshow
 * multiple widget support
 
-Due to the growing popularity of my plugins I have launched a [website](http://kolja.galerie-neander.de/)!
 
 **Version 1.3+ is PHP4 compatible.**
 
@@ -31,6 +30,12 @@ To install the plugin to the following steps
 3. Go to the widget page and add it to your sidebar.
 
 == ChangeLog ==
+
+V1.5 - May, 2009
+
+* CHANGED: switched to jQuery Cycle Plugin. Hopefully fixes IE bug
+* CHANGED: input title manually so no title is possible
+* BUGFIX: display function to enable static display
 
 V.1.4 - April 8, 2009
 

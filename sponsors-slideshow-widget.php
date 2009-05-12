@@ -4,7 +4,7 @@ Plugin Name: Sponsors Slideshow Widget
 Author URI: http://kolja.galerie-neander.de/
 Plugin URI: http://kolja.galerie-neander.de/plugins/#sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 1.4
+Version: 1.5
 Author: Kolja Schleich
 
 Copyright 2007-2008  Kolja Schleich  (email : kolja.schleich@googlemail.com)
@@ -31,7 +31,7 @@ class SponsorsSlideshowWidget
 	 *
 	 * @var string
 	 */
-	var $version = '1.4';
+	var $version = '1.5';
 	
 	/**
 	 * path to the plugin
@@ -125,18 +125,24 @@ class SponsorsSlideshowWidget
 	 * @param array $args1
 	 * @return void
 	 */
-	function display($args, $args1)
+	function display($args, $args1 = array('number' => ''))
 	{
 		$options = get_option( 'sponsors_slideshow_widget' );
 		$options = $options[$args1['number']];
 		
 		$defaults = array(
-			'before_widget' => '<li id="sponsors_slideshow_widget" class="widget '.get_class($this).'_'.__FUNCTION__.'">',
+			'before_widget' => '<li id="sponsors-slideshow-widget-'.$args1['number'].'" class="widget '.get_class($this).'_'.__FUNCTION__.'">',
 			'after_widget' => '</li>',
 			'before_title' => '<h2 class="widgettitle">',
 			'after_title' => '</h2>',
 			'widget_title' => $options['title'],
 			'category' => $options['category'],
+			'number'  => $args1['number'],
+			'fade' => $options['fade'],
+			'time' => $options['time'],
+			'order' => $options['order'],
+			'width' => $options['width'],
+			'height' => $options['height']
 		);
 		
 		$args = array_merge( $defaults, $args );
@@ -147,24 +153,33 @@ class SponsorsSlideshowWidget
 			?>
 			<script type='text/javascript'>
 			//<![CDATA[
-			jQuery('#sponsors_slideshow_<?php echo $args1['number'] ?>').cycle({
-				timeout: <?php echo $options['time']*1000; ?>,
-				fx: '<?php echo $options['fade'] ?>',
-				random: <?php echo $options['order'] ?>
+			jQuery(document).ready(function() {
+				jQuery('#sponsors_slideshow_<?php echo $number ?>').cycle({
+					fx: '<?php echo $fade; ?>',
+					timeout: <?php echo $time*1000; ?>,
+					random: <?php echo $order; ?>
+				});
 			});
 			//]]>
 			</script>
 			<style type="text/css">
-				div#sponsors_slideshow_<?php echo $args1['number'] ?> {
-					width: <?php echo $options['width'] ?>px;
-					height:<?php echo $options['height']; ?>px;
+				div#sponsors_slideshow_<?php echo $number ?> {
+					width: <?php echo $width; ?>px;
+					height: <?php echo $height; ?>px;
 				}
 			</style>
 			<?php
-			echo $before_widget . $before_title . $widget_title . $after_title;
-			echo '<div id="sponsors_slideshow_'.$args1['number'].'" class="sponsors_slideshow">';
+			echo $before_widget;
+
+			if ( !empty($widget_title) ) echo $before_title . $widget_title . $after_title;
+
+			echo '<div id="sponsors_slideshow_'.$number.'" class="sponsors_slideshow">';
 			foreach ( $links AS $link ) {
-				echo '<a href="'.$link->link_url.'" target="_blank" title="'.$link->link_name.'"><img src="'.$link->link_image.'" alt="'.$link->link_name.'" /></a>';
+				echo '<a href="'.$link->link_url.'" target="_blank" title="'.$link->link_name.'">';
+				if ( !empty($link->link_image) ) echo '<img src="'.$link->link_image.'" alt="'.$link->link_name.'" />';
+				else
+					echo $link->link_name;
+				echo '</a>';
 			}
 			echo '</div>';
 			echo $after_widget;
@@ -195,8 +210,8 @@ class SponsorsSlideshowWidget
 					$args['number'] = $widget_number;
 					$options['last_number'] = $widget_number;
 				}
-				$categories = $wpdb->get_results( "SELECT name FROM $wpdb->terms WHERE `term_id` = {$values['category']}" );
-				$values['title'] = wp_specialchars($categories[0]->name);
+//				$categories = $wpdb->get_results( "SELECT name FROM $wpdb->terms WHERE `term_id` = {$values['category']}" );
+//				$values['title'] = wp_specialchars($categories[0]->name);
 				$options[$widget_number] = $values;	
 			}
 			// update number
@@ -217,6 +232,7 @@ class SponsorsSlideshowWidget
 		
 		echo '<div id="sponsors_slideshow_control_'.$number.'" class="sponsors_slideshow_control">';
 		echo '<p><label for="'.$this->prefix.'_'.$number.'_category">'.__( 'Links', 'sponsors-slideshow' ).'</label> '.$this->linkCategories($opts['category'], $number).'</p>';
+		echo '<p><label for="'.$this->prefix.'_'.$number.'_title">'.__('Title', 'sponsors-slideshow').'</label><input type="text" size="15" name="'.$this->prefix.'['.$number.'][title]" id="'.$this->prefix.'_'.$number.'_title" value="'.$opts['title'].'" /></p>';
 		echo '<p><label for="'.$this->prefix.'_'.$number.'_width">'.__( 'Width', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="'.$this->prefix.'['.$number.'][width]" id="'.$this->prefix.'_'.$number.'_width" value="'.$opts['width'].'" /> px</p>';
 		echo '<p><label for="'.$this->prefix.'_'.$number.'_height">'.__( 'Height', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="'.$this->prefix.'['.$number.'][height]" id="'.$this->prefix.'_'.$number.'_height" value="'.$opts['height'].'" /> px</p>';
 		echo '<p><label for="'.$this->prefix.'_'.$number.'_time">'.__( 'Time', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->prefix.'['.$number.'][time]" id="'.$this->prefix.'_'.$number.'_time" size="1" value="'.$opts['time'].'" /> '.__( 'seconds','sponsors-slideshow').'</p>';
@@ -305,7 +321,7 @@ class SponsorsSlideshowWidget
 	*/
 	function fadeEffects( $selected, $number )
 	{
-		$effects = array(__('Fade','sponsors-slideshow') => 'fade', __('Zoom Fade','sponsors-slideshow') => 'fadeZoom', __('Scroll Up','sponsors-slideshow') => 'scrollUp', __('Scroll Left','sponsors-slideshow') => 'scrollLeft', __('Scroll Right','sponsors-slideshow') => 'scrollRight', __('Scroll Down','sponsors-slideshow') => 'scrollDown', __('Scroll Horizontal', 'sponsors-slideshow') => 'scrollHorz', __('Scroll Vertical', 'sponsors-slideshow') => 'scrotllVert', __( 'Zoom','sponsors-slideshow') => 'zoom', __('Grow X','sponsors-slideshow') => 'growX', __('Grow Y','sponsors-slideshow') => 'growY', __('Zoom BR','sponsors-slideshow') => 'zoomBR', __('Zoom TL','sponsors-slideshow') => 'zoomTL', __('Random','sponsors-slideshow') => 'random');
+		$effects = array(__('Blind X','sponsors-slideshow') => 'blindX', __('Blind Y','sponsors-slideshow') => 'blindY', __('Blind Z','sponsors-slideshow') => 'blindZ', __('Cover','sponsors-slideshow') => 'cover', __('Curtain X','sponsors-slideshow') => 'curtainX', __('Curtain Y','sponsors-slideshow') => 'curtain>', __('Fade','sponsors-slideshow') => 'fade', __('Fade Zoom','sponsors-slideshow') => 'fadeZoom', __('Scroll Up','sponsors-slideshow') => 'scrollUp', __('Scroll Left','sponsors-slideshow') => 'scrollLeft', __('Scroll Right','sponsors-slideshow') => 'scrollRight', __('Scroll Down','sponsors-slideshow') => 'scrollDown', __('Scroll Horizontal', 'sponsors-slideshow') => 'scrollHorz', __('Scroll Vertical', 'sponsors-slideshow') => 'scrotllVert', __('Shuffle','sponsors-slideshow') => 'shuffle', __('Slide X','sponsors-slideshow') => 'slideX', __('Slide Y','sponsors-slideshow') => 'slideY', __('Toss','sponsors-slideshow') => 'toss', __('Turn Up','sponsors-slideshow') => 'turnUp', __('Turn Down','sponsors-slideshow') => 'turnDown', __('Turn Left','sponsors-slideshow') => 'turnLeft', __('Turn Right','sponsors-slideshow') => 'turnRight', __('Uncover','sponsors-slideshow') => 'uncover', __('Wipe','sponsors-slideshow') => 'wipe', __( 'Zoom','sponsors-slideshow') => 'zoom', __('Grow X','sponsors-slideshow') => 'growX', __('Grow Y','sponsors-slideshow') => 'growY');
 		
 		$out = '<select size="1" name="'.$this->prefix.'['.$number.'][fade]" id="'.$this->prefix.'_'.$number.'_fade">';
 		foreach ( $effects AS $name => $effect ) {
@@ -399,7 +415,19 @@ $sponsors_slideshow_widget = new SponsorsSlideshowWidget();
 /**
  * Wrapper function to display Sponsors Slideshow Widget statically
  *
- * @param string/array $args
+ * @param array $args
+ *
+ * This function can be used to display Sponsors Slideshow Widget in a Non-widgetized Theme.
+ * Below is a list of needed arguments passed as an assoziative Array
+ *
+ * - number: uniqute integer to identify widget for use of numerous widgets
+ * - category: ID of Link category to display
+ * - widget_title: Widget title, if left empty no title will be displayed
+ * - fade: Fade effect, see http://malsup.com/jquery/cycle/begin.html for a list of available effects
+ * - time: Time in seconds between images
+ * - width: width in px of the Slideshow
+ * - height: height in px  of the Slideshow
+ * - order: 0 for sequential, 1 for random ordering of images
  */
 function sponsors_slideshow_widget_display( $args = array() ) {
 	global $sponsors_slideshow_widget;
