@@ -164,7 +164,7 @@ class SponsorsSlideshowWidget
 			//]]>
 			</script>
 			<style type="text/css">
-				div#sponsors_slideshow_<?php echo $number ?> {
+				div#sponsors_slideshow_<?php echo $number ?> div {
 					width: <?php echo $width; ?>px;
 					height: <?php echo $height; ?>px;
 				}
@@ -176,11 +176,11 @@ class SponsorsSlideshowWidget
 
 			echo '<div id="sponsors_slideshow_'.$number.'" class="sponsors_slideshow">';
 			foreach ( $links AS $link ) {
-				echo '<a href="'.$link->link_url.'" target="_blank" title="'.$link->link_name.'">';
+				echo '<div><a href="'.$link->link_url.'" target="_blank" title="'.$link->link_name.'">';
 				if ( !empty($link->link_image) ) echo '<img src="'.$link->link_image.'" alt="'.$link->link_name.'" />';
 				else
 					echo $link->link_name;
-				echo '</a>';
+				echo '</a></div>';
 			}
 			echo '</div>';
 			echo $after_widget;

@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: 1.5\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/sponsors-slideshow-widget\n"
-"POT-Creation-Date: 2009-01-10 12:46+0000\n"
+"POT-Creation-Date: 2009-05-13 01:51+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -14,88 +14,160 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: sponsors-slideshow-widget.php:123
+#: sponsors-slideshow-widget.php:96
+msgid "Sponsors Slideshow"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:97
+msgid "Display specific link category as image slide show"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:235
 msgid "Links"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:124
+#: sponsors-slideshow-widget.php:236
+msgid "Title"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:237
 msgid "Width"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:125
+#: sponsors-slideshow-widget.php:238
 msgid "Height"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:126
+#: sponsors-slideshow-widget.php:239
 msgid "Time"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:126
+#: sponsors-slideshow-widget.php:239
 msgid "seconds"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:127
+#: sponsors-slideshow-widget.php:240
 msgid "Fade Effect"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:128
+#: sponsors-slideshow-widget.php:241
 msgid "Order"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:170
+#: sponsors-slideshow-widget.php:325
+msgid "Blind X"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
+msgid "Blind Y"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
+msgid "Blind Z"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
+msgid "Cover"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
+msgid "Curtain X"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
+msgid "Curtain Y"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
 msgid "Fade"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:170
-msgid "Zoom Fade"
+#: sponsors-slideshow-widget.php:325
+msgid "Fade Zoom"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:170
+#: sponsors-slideshow-widget.php:325
 msgid "Scroll Up"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:170
+#: sponsors-slideshow-widget.php:325
 msgid "Scroll Left"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:170
+#: sponsors-slideshow-widget.php:325
 msgid "Scroll Right"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:170
+#: sponsors-slideshow-widget.php:325
 msgid "Scroll Down"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:170
+#: sponsors-slideshow-widget.php:325
+msgid "Scroll Horizontal"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
+msgid "Scroll Vertical"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
+msgid "Shuffle"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
+msgid "Slide X"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
+msgid "Slide Y"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
+msgid "Toss"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
+msgid "Turn Up"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
+msgid "Turn Down"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
+msgid "Turn Left"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
+msgid "Turn Right"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
+msgid "Uncover"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
+msgid "Wipe"
+msgstr ""
+
+#: sponsors-slideshow-widget.php:325
 msgid "Zoom"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:170
+#: sponsors-slideshow-widget.php:325
 msgid "Grow X"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:170
+#: sponsors-slideshow-widget.php:325
 msgid "Grow Y"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:170
-msgid "Zoom BR"
-msgstr ""
-
-#: sponsors-slideshow-widget.php:170
-msgid "Zoom TL"
-msgstr ""
-
-#: sponsors-slideshow-widget.php:170 sponsors-slideshow-widget.php:190
+#: sponsors-slideshow-widget.php:325 sponsors-slideshow-widget.php:346
 msgid "Random"
 msgstr ""
 
-#: sponsors-slideshow-widget.php:190
+#: sponsors-slideshow-widget.php:346
 msgid "Ordered"
-msgstr ""
-
-#: sponsors-slideshow-widget.php:212
-msgid "Display specific link category as image slide show"
 msgstr ""
 
 #. Plugin Name of an extension
@@ -103,7 +175,7 @@ msgid "Sponsors Slideshow Widget"
 msgstr ""
 
 #. Plugin URI of an extension
-msgid "http://wordpress.org/extend/plugins/sponsors-slideshow-widget"
+msgid "http://kolja.galerie-neander.de/plugins/#sponsors-slideshow-widget"
 msgstr ""
 
 #. Description of an extension
@@ -112,4 +184,8 @@ msgstr ""
 
 #. Author of an extension
 msgid "Kolja Schleich"
+msgstr ""
+
+#. Author URI of an extension
+msgid "http://kolja.galerie-neander.de/"
 msgstr ""
