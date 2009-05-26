@@ -4,7 +4,7 @@ Plugin Name: Sponsors Slideshow Widget
 Author URI: http://kolja.galerie-neander.de/
 Plugin URI: http://kolja.galerie-neander.de/plugins/#sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 1.5
+Version: 1.6
 Author: Kolja Schleich
 
 Copyright 2007-2008  Kolja Schleich  (email : kolja.schleich@googlemail.com)
@@ -31,7 +31,7 @@ class SponsorsSlideshowWidget
 	 *
 	 * @var string
 	 */
-	var $version = '1.5';
+	var $version = '1.6';
 	
 	/**
 	 * path to the plugin
@@ -200,7 +200,7 @@ class SponsorsSlideshowWidget
 		
 		$options = get_option( 'sponsors_slideshow_widget' );
 		if(empty($options)) $options = array();
-		if(isset($options[0])) unset($options[0]);
+		//if(isset($options[0])) unset($options[0]);
 		
 		if(isset($_POST) && !empty($_POST[$this->prefix]) && is_array($_POST)) {
 			foreach($_POST[$this->prefix] as $widget_number => $values){
@@ -211,8 +211,6 @@ class SponsorsSlideshowWidget
 					$args['number'] = $widget_number;
 					$options['last_number'] = $widget_number;
 				}
-//				$categories = $wpdb->get_results( "SELECT name FROM $wpdb->terms WHERE `term_id` = {$values['category']}" );
-//				$values['title'] = wp_specialchars($categories[0]->name);
 				$options[$widget_number] = $values;	
 			}
 			// update number
@@ -238,7 +236,7 @@ class SponsorsSlideshowWidget
 		echo '<p><label for="'.$this->prefix.'_'.$number.'_height">'.__( 'Height', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="'.$this->prefix.'['.$number.'][height]" id="'.$this->prefix.'_'.$number.'_height" value="'.$opts['height'].'" /> px</p>';
 		echo '<p><label for="'.$this->prefix.'_'.$number.'_time">'.__( 'Time', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->prefix.'['.$number.'][time]" id="'.$this->prefix.'_'.$number.'_time" size="1" value="'.$opts['time'].'" /> '.__( 'seconds','sponsors-slideshow').'</p>';
 		echo '<p><label for="'.$this->prefix.'_'.$number.'_fade">'.__( 'Fade Effect', 'sponsors-slideshow' ).'</label>'.$this->fadeEffects($opts['fade'], $number).'</p>';
-		echo '<p><label for="'.$this->prefix.'_'.$number.'_order">'.__('Order','sponsors-slideshow').'</label>'.$this->order($opts['random'], $number).'</p>';
+		echo '<p><label for="'.$this->prefix.'_'.$number.'_order">'.__('Order','sponsors-slideshow').'</label>'.$this->order($opts['order'], $number).'</p>';
 		echo '</div>';
 		
 		return;
@@ -254,6 +252,9 @@ class SponsorsSlideshowWidget
 		global $wp_registered_widgets;
 		static $updated = false;
 		
+		$option_name = 'sponsors_slideshow_widget';
+
+require_once('/var/www/wordpress/wp-includes/widgets.php');
 		// get active sidebar
 		$sidebars_widgets = wp_get_sidebars_widgets();
 		if ( isset($sidebars_widgets[$sidebar]) )
@@ -406,7 +407,13 @@ class SponsorsSlideshowWidget
 	 function widget_links_args( $args )
 	 {
 		$options = get_option('sponsors_slideshow_widget');
-		$args['exclude_category'] = $options['category'];
+		unset($options['version']);
+		$excludes = array();
+		foreach ( $options AS $option )
+			$excludes[] = $option['category'];
+
+		$exclude = implode(',', $excludes);
+		$args['exclude_category'] = $exclude;
 		return $args;
 	 }
 }
@@ -434,3 +441,4 @@ function sponsors_slideshow_widget_display( $args = array() ) {
 	global $sponsors_slideshow_widget;
 	$sponsors_slideshow_widget->display( $args );
 }
+?>
