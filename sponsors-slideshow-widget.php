@@ -240,6 +240,7 @@ class SponsorsSlideshowWidget
 			
 				$options[$widget_number] = $values;	
 			}
+			$options['version'] = $this->version;
 			update_option('sponsors_slideshow_widget', $options);
 			$updated = true;
 		}
