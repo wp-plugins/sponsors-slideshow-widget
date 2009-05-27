@@ -65,7 +65,7 @@ class SponsorsSlideshowWidget
 		register_activation_hook(__FILE__, array(&$this, 'activate') );
 		load_plugin_textdomain( 'sponsors-slideshow', false, basename(__FILE__, '.php').'/languages' );
 
-		add_action( 'init', array(&$this, 'register') );
+		add_action( 'widgets_init', array(&$this, 'register') );
 		add_action( 'admin_head', array(&$this, 'addHeaderCode') );
 		add_action( 'wp_head', array(&$this, 'addHeaderCode') );
 
@@ -93,13 +93,13 @@ class SponsorsSlideshowWidget
 		if ( !function_exists("wp_register_sidebar_widget") )
 			return;
 
+		$options = get_option('sponsors_slideshow_widget');
+		unset($options['version']);
+
 		$name = __('Sponsors Slideshow', 'sponsors-slideshow');
 		$widget_ops = array('classname' => 'sponsors_slideshow_widget', 'description' => __('Display specific link category as image slide show', 'sponsors-slideshow') );
 		$control_ops = array('width' => 200, 'height' => 200, 'id_base' => $this->prefix);
 		
-		$options = get_option('sponsors_slideshow_widget');
-		unset($options['version']);
-		if (isset($options[0])) unset($options[0]);
 		
 		if ( !empty($options)) {
 			foreach(array_keys($options) AS $widget_number) {
@@ -107,10 +107,8 @@ class SponsorsSlideshowWidget
 				wp_register_widget_control($this->prefix.'-'.$widget_number, $name, array(&$this, 'control'), $control_ops, array('number' => $widget_number));
 			}
 		} else {
-			$options = array();
-			$widget_number = 1;
-			wp_register_sidebar_widget($this->prefix.'-'.$widget_number, $name, array(&$this, 'display'), $widget_ops, array('number' => $widget_number));
-			wp_register_widget_control($this->prefix.'-'.$widget_number, $name, array(&$this, 'control'), $control_ops, array('number' => $widget_number));
+			wp_register_sidebar_widget($this->prefix.'-1', $name, array(&$this, 'display'), $widget_ops, array('number' => -1));
+			wp_register_widget_control($this->prefix.'-1', $name, array(&$this, 'control'), $control_ops, array('number' => -1));
 		}
 	}
 	
@@ -122,22 +120,27 @@ class SponsorsSlideshowWidget
 	 * However it can also be called manually via sponsors_slideshow_widget_display().
 	 *
 	 * @param array $args
-	 * @param array $args1
+	 * @param array|int $widget_args Widget number
 	 * @return void
 	 */
-	function display($args, $args1 = array('number' => ''))
+	function display( $args, $widget_args = 1 )
 	{
+		if ( is_numeric($widget_args) )
+			$widget_args = array( 'number' => $widget_args );
+		$widget_args = wp_parse_args( $widget_args, array( 'number' => -1 ) );
+		extract($widget_args, EXTR_SKIP);
+
 		$options = get_option( 'sponsors_slideshow_widget' );
-		$options = $options[$args1['number']];
+		$options = $options[$number];
 		
 		$defaults = array(
-			'before_widget' => '<li id="sponsors-slideshow-widget-'.$args1['number'].'" class="widget '.get_class($this).'_'.__FUNCTION__.'">',
+			'before_widget' => '<li id="sponsors-slideshow-widget-'.$number.'" class="widget '.get_class($this).'_'.__FUNCTION__.'">',
 			'after_widget' => '</li>',
 			'before_title' => '<h2 class="widgettitle">',
 			'after_title' => '</h2>',
 			'widget_title' => $options['title'],
 			'category' => $options['category'],
-			'number'  => $args1['number'],
+			'number'  => $number,
 			'fade' => $options['fade'],
 			'time' => $options['time'],
 			'order' => $options['order'],
@@ -146,7 +149,7 @@ class SponsorsSlideshowWidget
 		);
 		
 		$args = array_merge( $defaults, $args );
-		extract( $args );
+		extract( $args, EXTR_SKIP );
 			
 		$links = get_bookmarks( array('category' => $category) );
 		if ( $links ) {
@@ -194,37 +197,58 @@ class SponsorsSlideshowWidget
 	 * @param array $args
 	 * @return void
 	 */
-	function control($args)
+	function control( $widget_args = 1 )
 	{
-		global $wpdb;
+		global $wp_registered_widgets;
+		static $updated = false;
+		
+		if ( is_numeric($widget_args) )
+			$widget_args = array( 'number' => $widget_args );
+		$widget_args = wp_parse_args( $widget_args, array( 'number' => -1 ) );
+		extract($widget_args, EXTR_SKIP);
 		
 		$options = get_option( 'sponsors_slideshow_widget' );
+		unset($options['version']);
 		if(empty($options)) $options = array();
-		//if(isset($options[0])) unset($options[0]);
 		
-		if(isset($_POST) && !empty($_POST[$this->prefix]) && is_array($_POST)) {
+		if( !$updated && !empty($_POST['sidebar']) ) {
+			// Tells us what sidebar to put the data in
+			$sidebar = (string) $_POST['sidebar'];
+
+			$sidebars_widgets = wp_get_sidebars_widgets();
+			if ( isset($sidebars_widgets[$sidebar]) )
+				$this_sidebar =& $sidebars_widgets[$sidebar];
+			else
+				$this_sidebar = array();
+
+			// search unused options
+			foreach ( $this_sidebar as $_widget_id ) {
+				if(preg_match('/'.$this->prefix.'-([0-9]+)/i', $_widget_id, $match)){
+					$widget_number = $match[1];
+ 
+					// $_POST['widget-id'] contain current widgets set for current sidebar
+					// $this_sidebar is not updated yet, so we can determine which was deleted
+					if(!in_array($match[0], $_POST['widget-id']))
+						unset($options[$widget_number]);
+				}
+			}
+
+
 			foreach($_POST[$this->prefix] as $widget_number => $values){
 				if(empty($values) && isset($options[$widget_number])) // user clicked cancel
 					continue;
 			
-				if(!isset($options[$widget_number]) && $args['number'] == -1){
-					$args['number'] = $widget_number;
-					$options['last_number'] = $widget_number;
-				}
 				$options[$widget_number] = $values;	
 			}
-			// update number
-			if($args['number'] == -1 && !empty($options['last_number'])){
-				$args['number'] = $options['last_number'];
-			}
-			// clear unused options and update options in DB. return actual options array
-			$options = $this->updateOptions($this->prefix, $options, $_POST[$this->prefix], $_POST['sidebar'], 'sponsors_slideshow_widget');
+			update_option('sponsors_slideshow_widget', $options);
+			$updated = true;
 		}
+
 		/* $number - is dynamic number for multi widget, given by WP
 		 * by default $number = -1 (if no widgets activated). In this case we should use %i% for inputs
 		 * to allow WP generate number automatically
 		 */
-		$number = ($args['number'] == -1)? '%i%' : $args['number'];
+		if ( $number == -1 ) $number = '%i%';
  
 		// now we can output control
 		$opts = @$options[$number];
@@ -242,50 +266,6 @@ class SponsorsSlideshowWidget
 		return;
 	}
 
-	
-	/**
-	 * Universal update helper
-	 *
-	 */
-	function updateOptions($id_prefix, $options, $post, $sidebar, $option_name = '')
-	{
-		global $wp_registered_widgets;
-		static $updated = false;
-		
-		$option_name = 'sponsors_slideshow_widget';
-
-require_once('/var/www/wordpress/wp-includes/widgets.php');
-		// get active sidebar
-		$sidebars_widgets = wp_get_sidebars_widgets();
-		if ( isset($sidebars_widgets[$sidebar]) )
-			$this_sidebar =& $sidebars_widgets[$sidebar];
-		else
-			$this_sidebar = array();
-
-		// search unused options
-		foreach ( $this_sidebar as $_widget_id ) {
-			if(preg_match('/'.$id_prefix.'-([0-9]+)/i', $_widget_id, $match)){
-				$widget_number = $match[1];
- 
-				// $_POST['widget-id'] contain current widgets set for current sidebar
-				// $this_sidebar is not updated yet, so we can determine which was deleted
-				if(!in_array($match[0], $_POST['widget-id'])){
-					unset($options[$widget_number]);
-				}
-			}
-		}
-			
-		// update database
-		if(!empty($option_name)){
-			$options['version'] = $this->version;
-			update_option($option_name, $options);
-			$updated = true;
-		}
-		
-		// return updated array
-		return $options;
-	}
-	
 	
 	/**
 	 * display link categories as dropdown list
@@ -424,6 +404,7 @@ $sponsors_slideshow_widget = new SponsorsSlideshowWidget();
  * Wrapper function to display Sponsors Slideshow Widget statically
  *
  * @param array $args
+ * @param int $number what widget do we have, needed for numerous widgets
  *
  * This function can be used to display Sponsors Slideshow Widget in a Non-widgetized Theme.
  * Below is a list of needed arguments passed as an assoziative Array
@@ -437,8 +418,9 @@ $sponsors_slideshow_widget = new SponsorsSlideshowWidget();
  * - height: height in px  of the Slideshow
  * - order: 0 for sequential, 1 for random ordering of images
  */
-function sponsors_slideshow_widget_display( $args = array() ) {
+function sponsors_slideshow_widget_display( $args = array(), $number = 1 ) {
 	global $sponsors_slideshow_widget;
-	$sponsors_slideshow_widget->display( $args );
+	$sponsors_slideshow_widget->display( $args, $number );
 }
+
 ?>
