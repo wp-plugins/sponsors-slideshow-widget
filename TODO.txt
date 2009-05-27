@@ -1,2 +1,2 @@
-- set title manually
-- bug in IE so first image is only displayed in half on site load
+BUGFIX:
+- unsetting of options
