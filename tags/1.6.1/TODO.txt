@@ -1,0 +1,2 @@
+BUGFIX:
+- unsetting of options
