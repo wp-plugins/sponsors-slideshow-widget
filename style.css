@@ -3,6 +3,7 @@
 	background-color: transparent;
 	position: relative;
 	display: block;
+	clear: both;
 	text-align: center;
 	margin: 1em auto;
 	padding: 0;

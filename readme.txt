@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: plugin, sidebar, widget, sponsor links, slideshow
 Requires at least: 2.7
 Tested up to: 2.7.1
-Stable tag: 1.6
+Stable tag: 1.6.1
 
 Widget to display a certain link category with images as slide show.
 
@@ -30,6 +30,9 @@ To install the plugin to the following steps
 3. Go to the widget page and add it to your sidebar.
 
 == ChangeLog ==
+
+V1.6.1 - June 9, 2009
+- BUGFIX: <br/> with clear both if no title present (IE fix)
 
 V1.6 - May 26, 2009
 
