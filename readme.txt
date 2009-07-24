@@ -28,30 +28,30 @@ To install the plugin to the following steps
 
 == ChangeLog ==
 
-V1.7.2 - July 23, 2009
-- BUGFIX: static function to display widget
+= 1.7.2 =
+* BUGFIX: static function to display widget
 
-V1.7.1 - June 18, 2009
-- CHANGED: insert <br style="clear: both;"> if title is "N/A"
+= 1.7.1 =
+* CHANGED: insert <br style="clear: both;"> if title is "N/A"
 
-V1.7 - June 18, 2009
-- New WP 2.8 Widgets API
+= 1.7 =
+* New WP 2.8 Widgets API
 
-V1.6.1 - June 9, 2009
-- BUGFIX: <br/> with clear both if no title present (IE fix)
+= 1.6.1 =
+* BUGFIX: <br/> with clear both if no title present (IE fix)
 
-V1.6 - May 26, 2009
-
+= 1.6 =
 * BUGFIX: exclusion of link categories from link widget
 * BUGFIX: deletion of options if widget is deleted
 
-V1.5 - May 12, 2009
-
+= 1.5 =
 * CHANGED: switched to jQuery Cycle Plugin. Hopefully fixes IE bug
 * CHANGED: input title manually so no title is possible
 * BUGFIX: display function to enable static display
 
-V.1.4 - April 8, 2009
-
+= 1.4 =
 * NEW: multiple widget support
 * BUGFIX: centering of slideshow
+
+= 1.0 =
+* Initial release
