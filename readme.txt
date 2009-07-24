@@ -2,9 +2,9 @@
 Contributors: Kolja Schleich
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2329191
 Tags: plugin, sidebar, widget, sponsor links, slideshow
-Requires at least: 2.7
-Tested up to: 2.7.1
-Stable tag: 1.6
+Requires at least: 2.8
+Tested up to: 2.8
+Stable tag: 1.7.2
 
 Widget to display a certain link category with images as slide show.
 
@@ -18,9 +18,6 @@ This plugin is designed to be used as sponsors slide show widget. It can display
 * random or ordered slideshow
 * multiple widget support
 
-
-**Version 1.3+ is PHP4 compatible.**
-
 == Installation ==
 
 To install the plugin to the following steps
@@ -30,6 +27,18 @@ To install the plugin to the following steps
 3. Go to the widget page and add it to your sidebar.
 
 == ChangeLog ==
+
+V1.7.2 - July 23, 2009
+- BUGFIX: static function to display widget
+
+V1.7.1 - June 18, 2009
+- CHANGED: insert <br style="clear: both;"> if title is "N/A"
+
+V1.7 - June 18, 2009
+- New WP 2.8 Widgets API
+
+V1.6.1 - June 9, 2009
+- BUGFIX: <br/> with clear both if no title present (IE fix)
 
 V1.6 - May 26, 2009
 
