@@ -4,7 +4,7 @@ Plugin Name: Sponsors Slideshow Widget
 Author URI: http://kolja.galerie-neander.de/
 Plugin URI: http://kolja.galerie-neander.de/plugins/#sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 1.7.2
+Version: 1.7.3
 Author: Kolja Schleich
 
 Copyright 2007-2008  Kolja Schleich  (email : kolja.schleich@googlemail.com)
@@ -31,7 +31,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '1.7.2';
+	var $version = '1.7.3';
 	
 	/**
 	 * path to the plugin
@@ -129,7 +129,8 @@ class SponsorsSlideshowWidget extends WP_Widget
 
 			echo '<div id="sponsors_slideshow_'.$this->number.'" class="sponsors_slideshow">';
 			foreach ( $links AS $link ) {
-				echo '<div><a href="'.$link->link_url.'" target="_blank" title="'.$link->link_name.'">';
+				$target = !empty($link->link_target) ? 'target="'.$link->link_target.'"' : '';
+				echo '<div><a href="'.$link->link_url.'" '.$target.' title="'.$link->link_name.'">';
 				if ( !empty($link->link_image) ) echo '<img src="'.$link->link_image.'" alt="'.$link->link_name.'" />';
 				else
 					echo $link->link_name;
