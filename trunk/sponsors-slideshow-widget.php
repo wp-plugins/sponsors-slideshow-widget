@@ -131,7 +131,8 @@ class SponsorsSlideshowWidget extends WP_Widget
 			foreach ( $links AS $link ) {
 				$target = !empty($link->link_target) ? 'target="'.$link->link_target.'"' : '';
 				echo '<div><a href="'.$link->link_url.'" '.$target.' title="'.$link->link_name.'">';
-				if ( !empty($link->link_image) ) echo '<img src="'.$link->link_image.'" alt="'.$link->link_name.'" />';
+				if ( !empty($link->link_image) )
+					echo '<img src="'.$link->link_image.'" alt="'.$link->link_name.'" />';
 				else
 					echo $link->link_name;
 				echo '</a></div>';
