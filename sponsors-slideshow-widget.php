@@ -4,7 +4,7 @@ Plugin Name: Sponsors Slideshow Widget
 Author URI: http://kolja.galerie-neander.de/
 Plugin URI: http://kolja.galerie-neander.de/plugins/#sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 1.7.3
+Version: 1.7.4
 Author: Kolja Schleich
 
 Copyright 2007-2008  Kolja Schleich  (email : kolja.schleich@googlemail.com)
@@ -31,7 +31,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '1.7.3';
+	var $version = '1.7.4';
 	
 	/**
 	 * path to the plugin
@@ -103,14 +103,14 @@ class SponsorsSlideshowWidget extends WP_Widget
 			?>
 			<script type='text/javascript'>
 			//<![CDATA[
-			jQuery(document).ready(function() {
+			//jQuery(document).ready(function() {
 				jQuery('#sponsors_slideshow_<?php echo $number ?>').cycle({
 					fx: '<?php echo $instance['fade']; ?>',
 					timeout: <?php echo $instance['time']*1000; ?>,
 					random: <?php echo $instance['order']; ?>,
 					pause: 1
 				});
-			});
+			//});
 			//]]>
 			</script>
 			<style type="text/css">
@@ -320,7 +320,7 @@ add_action('widgets_init', 'sponsors_slideshow_widget_init');
  * @param array $instance settings for this instance. See list below for parameters
  *
  * This function can be used to display Sponsors Slideshow Widget in a Non-widgetized Theme.
- * Below is a list of needed arguments passed as an assoziative Array
+ * Below is a list of needed arguments passed as an assoziative Array in $instance
  *
  * - category: ID of Link category to display
  * - widget_title: Widget title, if left empty no title will be displayed
