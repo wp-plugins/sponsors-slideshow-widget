@@ -1,4 +1,4 @@
-.sponsors_slideshow {
+.links_slideshow {
 	background-image: none;
 	background-color: transparent;
 	position: relative;
@@ -8,11 +8,11 @@
 	margin: 1em auto;
 	padding: 0;
 }
-.sponsors_slideshow a {
+.links_slideshow a {
 	display: block;
 	/*margin: 8px auto;*/
 }
-.sponsors_slideshow img {
+.links_slideshow img {
 	border: none;
 	display: block;
 	margin: 0 auto;
@@ -20,16 +20,16 @@
 }
 
 	
-.sponsors_slideshow_control p {
+.links_slideshow_control p {
 	text-align: left;
 	clear: both;
 }
-.sponsors_slideshow_control label {
+.links_slideshow_control label {
 	padding: 0.5em 0.5em;
 	width: 6em;
 	float: left;
 }
-.sponsors_slideshow_control input {
+.links_slideshow_control input {
 	display: inline;
 	clear: none;
 	width: auto;

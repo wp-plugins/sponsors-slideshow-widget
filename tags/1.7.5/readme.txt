@@ -3,8 +3,8 @@ Contributors: Kolja Schleich
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2329191
 Tags: plugin, sidebar, widget, sponsor links, slideshow
 Requires at least: 2.8
-Tested up to: 2.8
-Stable tag: 1.7.2
+Tested up to: 2.8.4
+Stable tag: 1.7.5
 
 Widget to display a certain link category with images as slide show.
 
@@ -27,6 +27,15 @@ To install the plugin to the following steps
 3. Go to the widget page and add it to your sidebar.
 
 == ChangeLog ==
+
+= 1.7.5 =
+* CHANGED: renamed classes to avoid Ad Blocker issues
+
+= 1.7.4 =
+* BUGFIX: removed document.ready part in slideshow function call
+
+= 1.7.3 =
+* NEW: use link target from link settings
 
 = 1.7.2 =
 * BUGFIX: static function to display widget

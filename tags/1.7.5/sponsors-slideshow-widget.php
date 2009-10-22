@@ -4,7 +4,7 @@ Plugin Name: Sponsors Slideshow Widget
 Author URI: http://kolja.galerie-neander.de/
 Plugin URI: http://kolja.galerie-neander.de/plugins/#sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 1.7.2
+Version: 1.7.5
 Author: Kolja Schleich
 
 Copyright 2007-2008  Kolja Schleich  (email : kolja.schleich@googlemail.com)
@@ -31,7 +31,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '1.7.2';
+	var $version = '1.7.5';
 	
 	/**
 	 * path to the plugin
@@ -103,18 +103,18 @@ class SponsorsSlideshowWidget extends WP_Widget
 			?>
 			<script type='text/javascript'>
 			//<![CDATA[
-			jQuery(document).ready(function() {
-				jQuery('#sponsors_slideshow_<?php echo $number ?>').cycle({
+			//jQuery(document).ready(function() {
+				jQuery('#links_slideshow_<?php echo $number ?>').cycle({
 					fx: '<?php echo $instance['fade']; ?>',
 					timeout: <?php echo $instance['time']*1000; ?>,
 					random: <?php echo $instance['order']; ?>,
 					pause: 1
 				});
-			});
+			//});
 			//]]>
 			</script>
 			<style type="text/css">
-				div#sponsors_slideshow_<?php echo $number ?> div {
+				div#links_slideshow_<?php echo $number ?> div {
 					width: <?php echo $instance['width']; ?>px;
 					height: <?php echo $instance['height']; ?>px;
 				}
@@ -127,10 +127,12 @@ class SponsorsSlideshowWidget extends WP_Widget
 			elseif ( $instance['title'] == 'N/A' )
 				echo "<br style='clear: both;' />"; // Fix for IE
 
-			echo '<div id="sponsors_slideshow_'.$this->number.'" class="sponsors_slideshow">';
+			echo '<div id="links_slideshow_'.$this->number.'" class="links_slideshow">';
 			foreach ( $links AS $link ) {
-				echo '<div><a href="'.$link->link_url.'" target="_blank" title="'.$link->link_name.'">';
-				if ( !empty($link->link_image) ) echo '<img src="'.$link->link_image.'" alt="'.$link->link_name.'" />';
+				$target = !empty($link->link_target) ? 'target="'.$link->link_target.'"' : '';
+				echo '<div><a href="'.$link->link_url.'" '.$target.' title="'.$link->link_name.'">';
+				if ( !empty($link->link_image) )
+					echo '<img src="'.$link->link_image.'" alt="'.$link->link_name.'" />';
 				else
 					echo $link->link_name;
 				echo '</a></div>';
@@ -162,7 +164,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	*/
 	function form( $instance )
 	{
-		echo '<div class="sponsors_slideshow_control">';
+		echo '<div class="links_slideshow_control">';
 		echo '<p><label for="'.$this->get_field_id('category').'">'.__( 'Links', 'sponsors-slideshow' ).'</label> '.$this->linkCategories($instance['category']).'</p>';
 		echo '<p><label for="'.$this->get_field_id('title').'">'.__('Title', 'sponsors-slideshow').'</label><input type="text" size="15" name="'.$this->get_field_name('title').'" id="'.$this->get_field_id('title').'" value="'.$instance['title'].'" /></p>';
 		echo '<p><label for="'.$this->get_field_id('width').'">'.__( 'Width', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="'.$this->get_field_name('width').'" id="'.$this->get_field_id('width').'" value="'.$instance['width'].'" /> px</p>';
@@ -318,7 +320,7 @@ add_action('widgets_init', 'sponsors_slideshow_widget_init');
  * @param array $instance settings for this instance. See list below for parameters
  *
  * This function can be used to display Sponsors Slideshow Widget in a Non-widgetized Theme.
- * Below is a list of needed arguments passed as an assoziative Array
+ * Below is a list of needed arguments passed as an assoziative Array in $instance
  *
  * - category: ID of Link category to display
  * - widget_title: Widget title, if left empty no title will be displayed
