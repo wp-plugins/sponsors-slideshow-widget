@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: plugin, sidebar, widget, sponsor links, slideshow
 Requires at least: 2.8
 Tested up to: 2.8.4
-Stable tag: 1.7.5
+Stable tag: 1.7.6
 
 Widget to display a certain link category with images as slide show.
 
@@ -27,6 +27,9 @@ To install the plugin to the following steps
 3. Go to the widget page and add it to your sidebar.
 
 == ChangeLog ==
+
+= 1.7.6 =
+* CHANGED: show plugin version in style.css load instead of WP Version
 
 = 1.7.5 =
 * CHANGED: renamed classes to avoid Ad Blocker issues
