@@ -28,6 +28,9 @@ To install the plugin to the following steps
 
 == ChangeLog ==
 
+= 1.8 =
+* NEW: links or posts as source for slideshow. Posts requires post meta fields for image and url
+
 = 1.7.6 =
 * CHANGED: show plugin version in style.css load instead of WP Version
 
