@@ -26,6 +26,10 @@ msgstr "Zeige bestimmte Linkkategorie als Slideshow"
 msgid "Links"
 msgstr "Links"
 
+#: sponsors-slideshow-widget.php:
+msgid "Source"
+msgstr "Quelle"
+
 #: sponsors-slideshow-widget.php:236
 msgid "Title"
 msgstr "Titel"
@@ -39,8 +43,12 @@ msgid "Height"
 msgstr "Höhe"
 
 #: sponsors-slideshow-widget.php:239
-msgid "Time"
-msgstr "Zeit"
+msgid "Timeout"
+msgstr "Timeout"
+
+#: sponsors-slideshow-widget:
+msgid "Speed"
+msgstr "Geschw."
 
 #: sponsors-slideshow-widget.php:239
 msgid "seconds"
