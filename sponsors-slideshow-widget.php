@@ -4,10 +4,10 @@ Plugin Name: Sponsors Slideshow Widget
 Author URI: http://kolja.galerie-neander.de/
 Plugin URI: http://kolja.galerie-neander.de/plugins/#sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 1.7.5
+Version: 1.9.1
 Author: Kolja Schleich
 
-Copyright 2007-2008  Kolja Schleich  (email : kolja.schleich@googlemail.com)
+Copyright 2007-2010  Kolja Schleich  (email : kolja.schleich@googlemail.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '1.7.5';
+	var $version = '1.9.1';
 	
 	/**
 	 * path to the plugin
@@ -98,15 +98,23 @@ class SponsorsSlideshowWidget extends WP_Widget
 		$args = array_merge( $defaults, $args );
 		extract( $args, EXTR_SKIP );
 			
-		$links = get_bookmarks( array('category' => $instance['category']) );
+		if ( $instance['source'] == 'links' )
+			$links = get_bookmarks( array('category' => $instance['link_category']) );
+		elseif ( $instance['source'] == 'posts' )
+			$links = query_posts("cat=".$instance['post_category']."&orderby=date&order=DESC");
+		else
+			$links = false;
+
 		if ( $links ) {
 			?>
+			<div>
 			<script type='text/javascript'>
 			//<![CDATA[
 			//jQuery(document).ready(function() {
 				jQuery('#links_slideshow_<?php echo $number ?>').cycle({
 					fx: '<?php echo $instance['fade']; ?>',
-					timeout: <?php echo $instance['time']*1000; ?>,
+					timeout: <?php echo $instance['timeout']*1000; ?>,
+					speed: <?php echo $instance['speed']*1000; ?>,
 					random: <?php echo $instance['order']; ?>,
 					pause: 1
 				});
@@ -119,6 +127,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 					height: <?php echo $instance['height']; ?>px;
 				}
 			</style>
+			</div>
 			<?php
 			echo $before_widget;
 
@@ -129,13 +138,22 @@ class SponsorsSlideshowWidget extends WP_Widget
 
 			echo '<div id="links_slideshow_'.$this->number.'" class="links_slideshow">';
 			foreach ( $links AS $link ) {
-				$target = !empty($link->link_target) ? 'target="'.$link->link_target.'"' : '';
-				echo '<div><a href="'.$link->link_url.'" '.$target.' title="'.$link->link_name.'">';
-				if ( !empty($link->link_image) )
-					echo '<img src="'.$link->link_image.'" alt="'.$link->link_name.'" />';
-				else
-					echo $link->link_name;
-				echo '</a></div>';
+				if ( $instance['source'] == 'posts' ) {
+					$link->link_name = $link->post_title;
+					$link->link_image = get_post_meta($link->ID, $instance['post_img_meta'], true);
+					$link->link_url = get_post_meta($link->ID, $instance['post_url_meta'], true);
+					$link->link_target = ( substr($link->link_url,7,strlen($_SERVER['HTTP_HOST'])) == $_SERVER['HTTP_HOST'] ) ? '' : '_blank';
+				}
+
+				if ( !empty($link->link_url) ) {
+					$target = !empty($link->link_target) ? 'target="'.$link->link_target.'"' : '';
+					echo '<div><a href="'.$link->link_url.'" '.$target.' title="'.$link->link_name.'">';
+					if ( !empty($link->link_image) )
+						echo '<img src="'.$link->link_image.'" alt="'.$link->link_name.'" />';
+					else
+						echo $link->link_name;
+					echo '</a></div>';
+				}
 			}
 			echo '</div>';
 			echo $after_widget;
@@ -164,12 +182,34 @@ class SponsorsSlideshowWidget extends WP_Widget
 	*/
 	function form( $instance )
 	{
+		$link_category_display = $post_category_display = 'none';
+		if ( !isset($instance['source']) || empty($instance['source']) ) {
+			$instance['source'] == 'links';
+			$link_category_display = 'block';
+		} elseif ( $instance['source'] == 'links' ) {
+			$link_category_display = 'block';
+		} elseif ( $instance['source'] == 'posts' ) {
+			$post_category_display = 'block';
+		}
+
 		echo '<div class="links_slideshow_control">';
-		echo '<p><label for="'.$this->get_field_id('category').'">'.__( 'Links', 'sponsors-slideshow' ).'</label> '.$this->linkCategories($instance['category']).'</p>';
+
+		echo '<p><label for="'.$this->get_field_id('source').'">'.__( 'Source', 'sponsors-slideshow' ).'</label>'.$this->sources($instance['source']).'</p>';
+
+		echo '<div id="box_'.$this->get_field_id('link_category').'" style="display: '.$link_category_display.';">';
+		echo '<p><label for="'.$this->get_field_id('link_category').'">'.__( 'Category', 'sponsors-slideshow' ).'</label> '.$this->categories('link_category', 'link_category', $instance['link_category']).'</p>';
+		echo '</div>';
+		echo '<div id="box_'.$this->get_field_id('post_category').'" style="display: '.$post_category_display.';">';
+		echo '<p><label for="'.$this->get_field_id('post_category').'">'.__( 'Category', 'sponsors-slieshow' ).'</label> '.$this->categories('category', 'post_category', $instance['post_category']).'</p>';
+		echo '<p><label for="'.$this->get_field_id('post_url_meta').'">'.__( 'URL Field', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('post_url_meta').'" id="'.$this->get_field_id('post_url_meta').'" value="'.$instance['post_url_meta'].'" size="10" /></p>';
+		echo '<p><label for="'.$this->get_field_id('post_img_meta').'">'.__( 'Image Field', 'sponsors-slieshow' ).'</label><input type="text" name="'.$this->get_field_name('post_img_meta').'" id="'.$this->get_field_id('post_img_meta').'" value="'.$instance['post_img_meta'].'" size="10" /></p>';
+		echo '</div>';
+
 		echo '<p><label for="'.$this->get_field_id('title').'">'.__('Title', 'sponsors-slideshow').'</label><input type="text" size="15" name="'.$this->get_field_name('title').'" id="'.$this->get_field_id('title').'" value="'.$instance['title'].'" /></p>';
 		echo '<p><label for="'.$this->get_field_id('width').'">'.__( 'Width', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="'.$this->get_field_name('width').'" id="'.$this->get_field_id('width').'" value="'.$instance['width'].'" /> px</p>';
 		echo '<p><label for="'.$this->get_field_id('height').'">'.__( 'Height', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="'.$this->get_field_name('height').'" id="'.$this->get_field_id('height').'" value="'.$instance['height'].'" /> px</p>';
-		echo '<p><label for="'.$this->get_field_id('time').'">'.__( 'Time', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('time').'" id="'.$this->get_field_id('time').'" size="1" value="'.$instance['time'].'" /> '.__( 'seconds','sponsors-slideshow').'</p>';
+		echo '<p><label for="'.$this->get_field_id('timeout').'">'.__( 'Timeout', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('timeout').'" id="'.$this->get_field_id('timeout').'" size="1" value="'.$instance['timeout'].'" /> '.__( 'seconds','sponsors-slideshow').'</p>';
+		echo '<p><label for="'.$this->get_field_id('speed').'">'.__( 'Speed', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('speed').'" id="'.$this->get_field_id('speed').'" size="3" value="'.$instance['speed'].'" /> '.__( 'seconds', 'sponsors-slideshow').'</p>';
 		echo '<p><label for="'.$this->get_field_id('fade').'">'.__( 'Fade Effect', 'sponsors-slideshow' ).'</label>'.$this->fadeEffects($instance['fade']).'</p>';
 		echo '<p><label for="'.$this->get_field_id('order').'">'.__('Order','sponsors-slideshow').'</label>'.$this->order($instance['order']).'</p>';
 		echo '</div>';
@@ -179,19 +219,40 @@ class SponsorsSlideshowWidget extends WP_Widget
 
 	
 	/**
-	 * display link categories as dropdown list
+	 * dropdown list of Source possibilites
 	 *
+	 * @param string $selected current order
+	 * @return order selection
+	 */
+	function sources( $selected )
+	{
+		$sources = array( 'links' => __('Links', 'sponsors-slideshow'), 'posts' => __('Posts', 'sponsors-slideshow') );
+		$out = "<select size='1' name='".$this->get_field_name('source')."' id='".$this->get_field_id('source')."' onChange='SponsorsSlideshowWidget.checkSource(this.value, \"box_".$this->get_field_id('link_category')."\", \"box_".$this->get_field_id('post_category')."\")'>";
+		foreach ( $sources AS $source => $name ) {
+			$checked =  ( $selected == $source ) ? " selected='selected'" : '';
+			$out .= '<option value="'.$source.'"'.$checked.'>'.$name.'</option>';
+		}
+		$out .= '</select>';
+		return $out;
+	}
+
+
+	/**
+	 * display categories as dropdown list
+	 *
+	 * @param string $term name of term
+	 * @param string $name field name
 	 * @param int $selected ID of selected category
 	 * @return select element of categories
 	 */
-	function linkCategories( $selected )
+	function categories( $term, $name, $selected )
 	{
-		$categories = get_terms('link_category', 'orderby=name&hide_empty=0');
+		$categories = get_terms($term, 'orderby=name&hide_empty=0');
 	
 		if ( empty($categories) )
 			return;
 	
-		$out = '<select size="1" name="'.$this->get_field_name('category').'" id="'.$this->get_field_id('category').'">';
+		$out = '<select size="1" name="'.$this->get_field_name($name).'" id="'.$this->get_field_id($name).'">';
 		foreach ( $categories as $category ) {
 			$cat_id = $category->term_id;
 			$name = wp_specialchars( apply_filters('the_category', $category->name));
@@ -280,9 +341,11 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 */
 	function addHeaderCode()
 	{
-		wp_register_style( 'sponsors-slideshow', $this->plugin_url.'/style.css' );
+		wp_register_style( 'sponsors-slideshow', $this->plugin_url.'/style.css', array(), $this->version );
+		wp_register_script( 'sponsors-slideshow', $this->plugin_url.'/sponsors-slideshow-widget.js', array(), $ths->version );
 		wp_register_script( 'jquery_slideshow', $this->plugin_url.'/js/jquery.cycle.all.js', array('jquery'), '2.65' );
 		wp_print_scripts( 'jquery_slideshow' );
+		wp_print_scripts( 'sponsors-slideshow' );
 		wp_print_styles( 'sponsors-slideshow' );
 	}
 	
