@@ -3,8 +3,8 @@ Contributors: Kolja Schleich
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2329191
 Tags: plugin, sidebar, widget, sponsor links, slideshow
 Requires at least: 2.8
-Tested up to: 2.8.4
-Stable tag: 1.9
+Tested up to: 2.9.2
+Stable tag: 1.9.1
 
 Widget to display a certain link category with images as slide show.
 
@@ -27,6 +27,9 @@ To install the plugin to the following steps
 3. Go to the widget page and add it to your sidebar.
 
 == ChangeLog ==
+
+= 1.9.1 =
+* BUGFIX: link category not displayed in widget control
 
 = 1.9 =
 * NEW: option to set time of transition (Speed) besides timout between each transition (Timeout)
