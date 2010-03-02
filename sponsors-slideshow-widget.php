@@ -4,7 +4,7 @@ Plugin Name: Sponsors Slideshow Widget
 Author URI: http://kolja.galerie-neander.de/
 Plugin URI: http://kolja.galerie-neander.de/plugins/#sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 1.9.1
+Version: 1.9.2
 Author: Kolja Schleich
 
 Copyright 2007-2010  Kolja Schleich  (email : kolja.schleich@googlemail.com)
@@ -31,7 +31,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '1.9.1';
+	var $version = '1.9.2';
 	
 	/**
 	 * path to the plugin
@@ -200,9 +200,9 @@ class SponsorsSlideshowWidget extends WP_Widget
 		echo '<p><label for="'.$this->get_field_id('link_category').'">'.__( 'Category', 'sponsors-slideshow' ).'</label> '.$this->categories('link_category', 'link_category', $instance['link_category']).'</p>';
 		echo '</div>';
 		echo '<div id="box_'.$this->get_field_id('post_category').'" style="display: '.$post_category_display.';">';
-		echo '<p><label for="'.$this->get_field_id('post_category').'">'.__( 'Category', 'sponsors-slieshow' ).'</label> '.$this->categories('category', 'post_category', $instance['post_category']).'</p>';
+		echo '<p><label for="'.$this->get_field_id('post_category').'">'.__( 'Category', 'sponsors-slideshow' ).'</label> '.$this->categories('category', 'post_category', $instance['post_category']).'</p>';
 		echo '<p><label for="'.$this->get_field_id('post_url_meta').'">'.__( 'URL Field', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('post_url_meta').'" id="'.$this->get_field_id('post_url_meta').'" value="'.$instance['post_url_meta'].'" size="10" /></p>';
-		echo '<p><label for="'.$this->get_field_id('post_img_meta').'">'.__( 'Image Field', 'sponsors-slieshow' ).'</label><input type="text" name="'.$this->get_field_name('post_img_meta').'" id="'.$this->get_field_id('post_img_meta').'" value="'.$instance['post_img_meta'].'" size="10" /></p>';
+		echo '<p><label for="'.$this->get_field_id('post_img_meta').'">'.__( 'Image Field', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('post_img_meta').'" id="'.$this->get_field_id('post_img_meta').'" value="'.$instance['post_img_meta'].'" size="10" /></p>';
 		echo '</div>';
 
 		echo '<p><label for="'.$this->get_field_id('title').'">'.__('Title', 'sponsors-slideshow').'</label><input type="text" size="15" name="'.$this->get_field_name('title').'" id="'.$this->get_field_id('title').'" value="'.$instance['title'].'" /></p>';
