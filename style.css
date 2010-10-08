@@ -10,6 +10,7 @@
 }
 .links_slideshow a {
 	display: block;
+	text-decoration: none;
 	/*margin: 8px auto;*/
 }
 .links_slideshow img {
