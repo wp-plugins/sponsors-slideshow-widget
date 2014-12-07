@@ -3,10 +3,10 @@
 Plugin Name: Sponsors Slideshow Widget
 Plugin URI: http://www.wordpress.org/extend/plugins/sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 1.9.3
+Version: 2.0
 Author: Kolja Schleich
 
-Copyright 2007-2010  Kolja Schleich  (email : kolja.schleich@googlemail.com)
+Copyright 2007-2014  Kolja Schleich  (email : kolja [dot] schleich [at] googlemail.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '1.9.2';
+	var $version = '2.0';
 	
 	/**
 	 * path to the plugin
@@ -121,7 +121,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 			//]]>
 			</script>
 			<style type="text/css">
-				div#links_slideshow_<?php echo $number ?> div {
+				div#links_slideshow_<?php echo $number ?> div, div#links_slideshow_<?php echo $number ?> img {
 					width: <?php echo $instance['width']; ?>px;
 					height: <?php echo $instance['height']; ?>px;
 				}
@@ -213,12 +213,12 @@ class SponsorsSlideshowWidget extends WP_Widget
 		echo '<p><label for="'.$this->get_field_id('order').'">'.__('Order','sponsors-slideshow').'</label>'.$this->order($instance['order']).'</p>';
 		echo '</div>';
 		
-		return;
+		//return;
 	}
 
 	
 	/**
-	 * dropdown list of Source possibilites
+	 * drop down list of link sources
 	 *
 	 * @param string $selected current order
 	 * @return order selection
@@ -237,7 +237,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 
 
 	/**
-	 * display categories as dropdown list
+	 * display categories as drop down list
 	 *
 	 * @param string $term name of term
 	 * @param string $name field name
@@ -265,7 +265,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	
 
 	/**
-	* dropdown list of available fade effects
+	* drop down list of available fade effects
 	*
 	* @param string $selected current effect
 	* @return select element of fade effects
@@ -285,7 +285,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	
 	
 	/**
-	 * dropdown list of Order possibilites
+	 * drop down list of order possibilities
 	 *
 	 * @param string $selected current order
 	 * @return order selection
@@ -350,7 +350,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	
 	
 	/**
-	 * redefine Links Widget Arguments to exclude chosen link category
+	 * redefine Links widget arguments to exclude chosen link category
 	 *
 	 * @param $args
 	 * @return array
@@ -382,7 +382,7 @@ add_action('widgets_init', 'sponsors_slideshow_widget_init');
  * @param array $instance settings for this instance. See list below for parameters
  *
  * This function can be used to display Sponsors Slideshow Widget in a Non-widgetized Theme.
- * Below is a list of needed arguments passed as an assoziative Array in $instance
+ * Below is a list of needed arguments passed as an associative Array in $instance
  *
  * - category: ID of Link category to display
  * - widget_title: Widget title, if left empty no title will be displayed
@@ -390,7 +390,7 @@ add_action('widgets_init', 'sponsors_slideshow_widget_init');
  * - time: Time in seconds between images
  * - width: width in px of the Slideshow
  * - height: height in px  of the Slideshow
- * - order: 0 for sequential, 1 for random ordering of images
+ * - order: 0 for sequential, 1 for random ordering of links
  */
 function sponsors_slideshow_widget_display( $args = array(), $instance = array() ) {
 	SponsorsSlideshowWidget::widget( $args, $instance );

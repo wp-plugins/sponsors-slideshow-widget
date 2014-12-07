@@ -2,19 +2,22 @@
 Contributors: Kolja Schleich
 Tags: plugin, sidebar, widget, sponsor links, slideshow
 Requires at least: 2.8
-Tested up to: 2.9.2
-Stable tag: 1.9.3
+Tested up to: 4.0.1
+Stable tag: 2.0
 
 Widget to display a certain link category with images as slide show.
 
 == Description ==
 
-This plugin is designed to be used as sponsors slide show widget. It can display a certain link category as slide show in the sidebar, using the [jQuery Cycle Plugin](http://malsup.com/jquery/cycle). It automatically excludes the chosen slideshow category from the Wordpress internal links widget. Below is a list of options.
+Display a slide show of certain link categories in widgets. 
+Since Wordpress 3.5 the standard Link Manager has been deactivated. The official plugin [Link Manager](https://wordpress.org/plugins/link-manager/) is required for this plugin to work.
 
-* set width an height of the slideshow
-* specify timeout between transitions and time of transition
+It can display a certain link category as slide show in the sidebar, using the [jQuery Cycle Plugin](http://malsup.com/jquery/cycle). It automatically excludes the chosen slideshow category from the Wordpress internal links widget. Below is a list of options.
+
+* set width an height of the slide show
+* specify time out between transitions and time of transition
 * choose from several different fade effects
-* random or ordered slideshow
+* random or ordered slide show
 * multiple widget support
 
 == Installation ==
@@ -26,6 +29,10 @@ To install the plugin to the following steps
 3. Go to the widget page and add it to your sidebar.
 
 == ChangeLog ==
+
+= 2.0 =
+* Compatible with Wordpress 4.0.1
+* Since Wordpress 3.5 the Link Manager is deactivated. The official plugin [Link Manager](https://wordpress.org/plugins/link-manager/) is required for the plugin to work
 
 = 1.9.3 =
 * BUGFIX: css links with underline
