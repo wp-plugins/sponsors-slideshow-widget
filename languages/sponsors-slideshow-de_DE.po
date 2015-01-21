@@ -30,6 +30,26 @@ msgstr "Links"
 msgid "Source"
 msgstr "Quelle"
 
+#: sponsors-slideshow-widget.php:199
+msgid "Category"
+msgstr "Kategorie"
+
+#: sponsors-slideshow-widget.php:200
+msgid "URL Field"
+msgstr "URL Feld"
+
+#: sponsors-slideshow-widget.php:200
+msgid "Post Meta-Field for Link URL"
+msgstr "Post Meta-Feld für Link URL"
+
+#: sponsors-slideshow-widget.php:201
+msgid "Post Meta-Field for Image URL"
+msgstr "Post Meta-Feld für Bild URL"
+
+#: sponsors-slideshow-widget.php:201
+msgid "Image Field"
+msgstr "Bild Feld"
+
 #: sponsors-slideshow-widget.php:236
 msgid "Title"
 msgstr "Titel"
