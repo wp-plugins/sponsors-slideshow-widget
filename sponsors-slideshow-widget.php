@@ -3,7 +3,7 @@
 Plugin Name: Sponsors Slideshow Widget
 Plugin URI: http://www.wordpress.org/extend/plugins/sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 2.1
+Version: 2.1.1
 Author: Kolja Schleich
 
 Copyright 2007-2015  Kolja Schleich  (email : kolja [dot] schleich [at] googlemail.com)
@@ -30,7 +30,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '2.1';
+	var $version = '2.1.1';
 	
 	/**
 	 * path to the plugin
@@ -54,7 +54,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 			define( 'WP_PLUGIN_URL', WP_CONTENT_URL. '/plugins' );
 			
 		register_activation_hook(__FILE__, array(&$this, 'install'));
-		register_uninstall_hook(__FILE__, array(&$this, 'uninstall'));
+		register_uninstall_hook(__FILE__, array('SponsorsSlideshowWidget', 'uninstall'));
 
 		// Load Textdomain
 		load_plugin_textdomain( 'sponsors-slideshow', false, basename(__FILE__, '.php').'/languages' );
@@ -240,7 +240,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 			if (!empty($categories)) {
 				foreach ( $categories as $category ) {
 					$cat_id = $category->term_id;
-					$name = wp_specialchars( apply_filters('the_category', $category->name));
+					$name = htmlspecialchars( apply_filters('the_category', $category->name));
 					$checked = ( $selected == $term."_".$cat_id ) ? ' selected="selected"' : '';
 					$out .= '<option value="'.$term."_".$cat_id.'"'.$checked.'> '. $name. '</option>';
 				}
@@ -315,7 +315,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 * @param none
 	 * @return void
 	 */
-	function uninstall()
+	static function uninstall()
 	{
 		delete_option( 'sponsors_slideshow_widget' );
 	}

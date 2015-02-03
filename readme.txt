@@ -3,7 +3,7 @@ Contributors: Kolja Schleich
 Tags: plugin, sidebar, widget, sponsor links, slideshow
 Requires at least: 2.8
 Tested up to: 4.1
-Stable tag: 2.1
+Stable tag: 2.1.1
 
 Widget to display a certain link category with images as slide show.
 
@@ -29,6 +29,9 @@ To install the plugin to the following steps
 3. Go to the widget page and add it to your sidebar.
 
 == ChangeLog ==
+
+= 2.1.1 =
+* BUGFIX: small notice in widget control panel
 
 = 2.1 =
 * NEW: Widget Control panel without Javascript
