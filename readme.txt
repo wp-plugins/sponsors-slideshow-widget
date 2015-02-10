@@ -24,9 +24,16 @@ It can display a certain link category as slide show in the sidebar, using the [
 
 To install the plugin to the following steps
 
-1. Unzip the zip-file and upload the content to your Wordpress Plugin directory.
-2. Activiate the plugin via the admin plugin page.
+1. Install and activiate the plugin via the admin plugin page.
+2. Install the plugin [Link Manager](https://wordpress.org/plugins/link-manager/) to bring back the pre-WP 3.5 Link System
 3. Go to the widget page and add it to your sidebar.
+4. You can choose as source "Links" or "Posts" and choose a certain category
+5. If Source is "Posts" you need to setup custom fields in the post page and insert respective names holding image url target page url
+
+== Screenshots ==
+1. Slideshow widget settings. The URL and Image Fields (below category dropdown) are only required if Source is Posts
+2. Custom fields for posts containing image url and target page url
+3. Link Management
 
 == ChangeLog ==
 
