@@ -28,7 +28,7 @@ To install the plugin to the following steps
 2. Install the plugin [Link Manager](https://wordpress.org/plugins/link-manager/) to bring back the pre-WP 3.5 Link System
 3. Go to the widget page and add it to your sidebar.
 4. You can choose as source "Links" or "Posts" and choose a certain category
-5. If Source is "Posts" you need to setup custom fields in the post page and insert respective names holding image url target page url
+5. If Source is "Posts" you need to setup custom fields in the post page and insert respective names holding image url target page url (see Screenshots)
 
 == Screenshots ==
 1. Slideshow widget settings. The URL and Image Fields (below category dropdown) are only required if Source is Posts
