@@ -3,7 +3,7 @@
 Plugin Name: Sponsors Slideshow Widget
 Plugin URI: http://www.wordpress.org/extend/plugins/sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 2.1.1
+Version: 2.1.2
 Author: Kolja Schleich
 
 Copyright 2007-2015  Kolja Schleich  (email : kolja [dot] schleich [at] googlemail.com)
@@ -30,15 +30,23 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '2.1.1';
+	var $version = '2.1.2';
 	
 	/**
-	 * path to the plugin
+	 * url to the plugin
 	 *
 	 * @var string
 	 */
 	var $plugin_url;
 
+	
+	/**
+	 * path to plugin
+	 *
+	 * @var string
+	 */
+	var $plugin_path;
+	
 	
 	/**
 	 * Class Constructor
@@ -60,11 +68,12 @@ class SponsorsSlideshowWidget extends WP_Widget
 		load_plugin_textdomain( 'sponsors-slideshow', false, basename(__FILE__, '.php').'/languages' );
 
 		$this->plugin_url = WP_PLUGIN_URL.'/'.basename(__FILE__, '.php');
+		$this->plugin_path = dirname(__FILE__);
 
 		add_action( 'admin_head', array(&$this, 'addHeaderCode') );
 		add_action( 'wp_head', array(&$this, 'addHeaderCode') );
 		add_filter( 'widget_links_args', array($this, 'widget_links_args') );
-
+		
 		$widget_ops = array('classname' => 'sponsors_slideshow_widget', 'description' => __('Display specific link category as image slide show', 'sponsors-slideshow') );
 		parent::__construct('sponsors-slideshow', __('Sponsors Slideshow', 'sponsors-slideshow'), $widget_ops);
 	}
@@ -113,9 +122,9 @@ class SponsorsSlideshowWidget extends WP_Widget
 			//jQuery(document).ready(function() {
 				jQuery('#links_slideshow_<?php echo $number ?>').cycle({
 					fx: '<?php echo $instance['fade']; ?>',
-					timeout: <?php echo $instance['timeout']*1000; ?>,
-					speed: <?php echo $instance['speed']*1000; ?>,
-					random: <?php echo $instance['order']; ?>,
+					timeout: <?php echo intval($instance['timeout'])*1000; ?>,
+					speed: <?php echo intval($instance['speed'])*1000; ?>,
+					random: <?php echo intval($instance['order']); ?>,
 					pause: 1
 				});
 			//});
@@ -123,8 +132,8 @@ class SponsorsSlideshowWidget extends WP_Widget
 			</script>
 			<style type="text/css">
 				div#links_slideshow_<?php echo $number ?> div, div#links_slideshow_<?php echo $number ?> img {
-					width: <?php echo $instance['width']; ?>px;
-					height: <?php echo $instance['height']; ?>px;
+					width: <?php echo intval($instance['width']); ?>px;
+					height: <?php echo intval($instance['height']); ?>px;
 				}
 			</style>
 			</div>
@@ -132,7 +141,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 			echo $before_widget;
 
 			if ( !empty($instance['title']) )
-				echo $before_title . $instance['title'] . $after_title;
+				echo $before_title . stripslashes($instance['title']) . $after_title;
 			elseif ( $instance['title'] == 'N/A' )
 				echo "<br style='clear: both;' />"; // Fix for IE
 
@@ -191,11 +200,11 @@ class SponsorsSlideshowWidget extends WP_Widget
 		echo '<p><label for="'.$this->get_field_id('post_category').'">'.__( 'Category', 'sponsors-slideshow' ).'</label> '.$this->categories($instance['category']).'</p>';
 		echo '<p><label for="'.$this->get_field_id('post_url_meta').'">'.__( 'URL Field', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('post_url_meta').'" id="'.$this->get_field_id('post_url_meta').'" value="'.$instance['post_url_meta'].'" size="10" /> '.__('Post Meta-Field for Link URL', 'sponsors-slideshow').'</p>';
 		echo '<p><label for="'.$this->get_field_id('post_img_meta').'">'.__( 'Image Field', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('post_img_meta').'" id="'.$this->get_field_id('post_img_meta').'" value="'.$instance['post_img_meta'].'" size="10" /> '.__('Post Meta-Field for Image URL', 'sponsors-slideshow').'</p>';
-		echo '<p><label for="'.$this->get_field_id('title').'">'.__('Title', 'sponsors-slideshow').'</label><input type="text" size="15" name="'.$this->get_field_name('title').'" id="'.$this->get_field_id('title').'" value="'.$instance['title'].'" /></p>';
-		echo '<p><label for="'.$this->get_field_id('width').'">'.__( 'Width', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="'.$this->get_field_name('width').'" id="'.$this->get_field_id('width').'" value="'.$instance['width'].'" /> px</p>';
-		echo '<p><label for="'.$this->get_field_id('height').'">'.__( 'Height', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="'.$this->get_field_name('height').'" id="'.$this->get_field_id('height').'" value="'.$instance['height'].'" /> px</p>';
-		echo '<p><label for="'.$this->get_field_id('timeout').'">'.__( 'Timeout', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('timeout').'" id="'.$this->get_field_id('timeout').'" size="1" value="'.$instance['timeout'].'" /> '.__( 'seconds','sponsors-slideshow').'</p>';
-		echo '<p><label for="'.$this->get_field_id('speed').'">'.__( 'Speed', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('speed').'" id="'.$this->get_field_id('speed').'" size="3" value="'.$instance['speed'].'" /> '.__( 'seconds', 'sponsors-slideshow').'</p>';
+		echo '<p><label for="'.$this->get_field_id('title').'">'.__('Title', 'sponsors-slideshow').'</label><input type="text" size="15" name="'.$this->get_field_name('title').'" id="'.$this->get_field_id('title').'" value="'.stripslashes($instance['title']).'" /></p>';
+		echo '<p><label for="'.$this->get_field_id('width').'">'.__( 'Width', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="'.$this->get_field_name('width').'" id="'.$this->get_field_id('width').'" value="'.intval($instance['width']).'" /> px</p>';
+		echo '<p><label for="'.$this->get_field_id('height').'">'.__( 'Height', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="'.$this->get_field_name('height').'" id="'.$this->get_field_id('height').'" value="'.intval($instance['height']).'" /> px</p>';
+		echo '<p><label for="'.$this->get_field_id('timeout').'">'.__( 'Timeout', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('timeout').'" id="'.$this->get_field_id('timeout').'" size="1" value="'.intval($instance['timeout']).'" /> '.__( 'seconds','sponsors-slideshow').'</p>';
+		echo '<p><label for="'.$this->get_field_id('speed').'">'.__( 'Speed', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('speed').'" id="'.$this->get_field_id('speed').'" size="3" value="'.intval($instance['speed']).'" /> '.__( 'seconds', 'sponsors-slideshow').'</p>';
 		echo '<p><label for="'.$this->get_field_id('fade').'">'.__( 'Fade Effect', 'sponsors-slideshow' ).'</label>'.$this->fadeEffects($instance['fade']).'</p>';
 		echo '<p><label for="'.$this->get_field_id('order').'">'.__('Order','sponsors-slideshow').'</label>'.$this->order($instance['order']).'</p>';
 		echo '</div>';
@@ -347,9 +356,11 @@ class SponsorsSlideshowWidget extends WP_Widget
 		$options = get_option('widget_sponsors-slideshow');
 		unset($options['version']);
 		$excludes = array();
-		foreach ( (array)$options AS $option )
-			$excludes[] = $option['category'];
-
+		foreach ( (array)$options AS $option ) {
+			$cat = explode("_", $option['category']);
+			$excludes[] = $cat[2];
+		}
+		
 		$exclude = implode(',', $excludes);
 		$args['exclude_category'] = $exclude;
 		return $args;

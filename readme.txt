@@ -2,8 +2,8 @@
 Contributors: Kolja Schleich
 Tags: plugin, sidebar, widget, sponsor links, slideshow
 Requires at least: 2.8
-Tested up to: 4.1
-Stable tag: 2.1.1
+Tested up to: 4.2.4
+Stable tag: 2.1.2
 
 Widget to display a certain link category with images as slide show.
 
@@ -36,6 +36,10 @@ To install the plugin to the following steps
 3. Link Management
 
 == ChangeLog ==
+
+= 2.1.2 = 
+* BUGFIX: fixed stripslashes in widget title
+* BUGFIX: fixed link category exclusion from link list
 
 = 2.1.1 =
 * BUGFIX: small notice in widget control panel
