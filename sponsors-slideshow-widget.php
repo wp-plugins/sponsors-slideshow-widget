@@ -3,7 +3,7 @@
 Plugin Name: Sponsors Slideshow Widget
 Plugin URI: http://www.wordpress.org/extend/plugins/sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 2.1.2
+Version: 2.1.3
 Author: Kolja Schleich
 
 Copyright 2007-2015  Kolja Schleich  (email : kolja [dot] schleich [at] googlemail.com)
@@ -30,7 +30,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '2.1.2';
+	var $version = '2.1.3';
 	
 	/**
 	 * url to the plugin
@@ -56,22 +56,26 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 */
 	function __construct()
 	{
+		// define constants
 		if ( !defined( 'WP_CONTENT_URL' ) )
 			define( 'WP_CONTENT_URL', get_option( 'siteurl' ) . '/wp-content' );
 		if ( !defined( 'WP_PLUGIN_URL' ) )
 			define( 'WP_PLUGIN_URL', WP_CONTENT_URL. '/plugins' );
 			
+		// define plugin url and path
+		$this->plugin_url = WP_PLUGIN_URL.'/'.basename(__FILE__, '.php');
+		$this->plugin_path = dirname(__FILE__);
+		
+		// register installation/deinstallation functions
 		register_activation_hook(__FILE__, array(&$this, 'install'));
 		register_uninstall_hook(__FILE__, array('SponsorsSlideshowWidget', 'uninstall'));
 
-		// Load Textdomain
+		// Load plugin translations
 		load_plugin_textdomain( 'sponsors-slideshow', false, basename(__FILE__, '.php').'/languages' );
 
-		$this->plugin_url = WP_PLUGIN_URL.'/'.basename(__FILE__, '.php');
-		$this->plugin_path = dirname(__FILE__);
-
-		add_action( 'admin_head', array(&$this, 'addHeaderCode') );
-		add_action( 'wp_head', array(&$this, 'addHeaderCode') );
+		// add stylesheet and scripts
+		add_action( 'wp_enqueue_scripts', array(&$this, 'addScripts'), 1 );
+		// filter links
 		add_filter( 'widget_links_args', array($this, 'widget_links_args') );
 		
 		$widget_ops = array('classname' => 'sponsors_slideshow_widget', 'description' => __('Display specific link category as image slide show', 'sponsors-slideshow') );
@@ -331,17 +335,15 @@ class SponsorsSlideshowWidget extends WP_Widget
 
 
 	/**
-	 * adds code to Wordpress head
+	 * add stylesheet and scripts
 	 *
 	 * @param none
 	 * @return void
 	 */
-	function addHeaderCode()
+	function addScripts()
 	{
-		wp_register_style( 'sponsors-slideshow', $this->plugin_url.'/style.css', array(), $this->version );
-		wp_register_script( 'jquery_slideshow', $this->plugin_url.'/js/jquery.cycle.all.js', array('jquery'), '2.65' );
-		wp_print_scripts( 'jquery_slideshow' );
-		wp_print_styles( 'sponsors-slideshow' );
+		wp_enqueue_style( 'sponsors-slideshow', $this->plugin_url.'/style.css', array(), $this->version, 'all' );
+		wp_enqueue_script( 'sponsors-slideshow-jquery', $this->plugin_url.'/js/jquery.cycle.all.js', array('jquery'), '2.65' );
 	}
 	
 	
