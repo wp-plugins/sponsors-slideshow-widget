@@ -3,7 +3,7 @@
 Plugin Name: Sponsors Slideshow Widget
 Plugin URI: http://www.wordpress.org/extend/plugins/sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 2.1.3
+Version: 2.1.5
 Author: Kolja Schleich
 
 Copyright 2007-2015  Kolja Schleich  (email : kolja [dot] schleich [at] googlemail.com)
@@ -30,7 +30,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '2.1.3';
+	var $version = '2.1.5';
 	
 	/**
 	 * url to the plugin
@@ -66,6 +66,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 		$this->plugin_url = WP_PLUGIN_URL.'/'.basename(__FILE__, '.php');
 		$this->plugin_path = dirname(__FILE__);
 		
+		
 		// register installation/deinstallation functions
 		register_activation_hook(__FILE__, array(&$this, 'install'));
 		register_uninstall_hook(__FILE__, array('SponsorsSlideshowWidget', 'uninstall'));
@@ -73,8 +74,10 @@ class SponsorsSlideshowWidget extends WP_Widget
 		// Load plugin translations
 		load_plugin_textdomain( 'sponsors-slideshow', false, basename(__FILE__, '.php').'/languages' );
 
-		// add stylesheet and scripts
-		add_action( 'wp_enqueue_scripts', array(&$this, 'addScripts'), 1 );
+		// add stylesheet and scripts to website and admin panel
+		add_action( 'wp_enqueue_scripts', array(&$this, 'addScripts'), 5 );
+		add_action( 'admin_enqueue_scripts', array(&$this, 'addStyles') );
+		
 		// filter links
 		add_filter( 'widget_links_args', array($this, 'widget_links_args') );
 		
@@ -120,11 +123,10 @@ class SponsorsSlideshowWidget extends WP_Widget
 
 		if ( $links ) {
 			?>
-			<div>
 			<script type='text/javascript'>
 			//<![CDATA[
 			//jQuery(document).ready(function() {
-				jQuery('#links_slideshow_<?php echo $number ?>').cycle({
+				jQuery('#links-slideshow-<?php echo $number ?>').cycle({
 					fx: '<?php echo $instance['fade']; ?>',
 					timeout: <?php echo intval($instance['timeout'])*1000; ?>,
 					speed: <?php echo intval($instance['speed'])*1000; ?>,
@@ -135,12 +137,11 @@ class SponsorsSlideshowWidget extends WP_Widget
 			//]]>
 			</script>
 			<style type="text/css">
-				div#links_slideshow_<?php echo $number ?> div, div#links_slideshow_<?php echo $number ?> img {
+				div#links-slideshow-<?php echo $number ?> div, div#links_slideshow_<?php echo $number ?> img {
 					width: <?php echo intval($instance['width']); ?>px;
 					height: <?php echo intval($instance['height']); ?>px;
 				}
 			</style>
-			</div>
 			<?php
 			echo $before_widget;
 
@@ -149,7 +150,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 			elseif ( $instance['title'] == 'N/A' )
 				echo "<br style='clear: both;' />"; // Fix for IE
 
-			echo '<div id="links_slideshow_'.$this->number.'" class="links_slideshow">';
+			echo '<div id="links-slideshow-'.$this->number.'" class="links-slideshow">';
 			foreach ( $links AS $link ) {
 				if ( $instance['source'] == 'posts' ) {
 					$link->link_name = $link->post_title;
@@ -196,10 +197,11 @@ class SponsorsSlideshowWidget extends WP_Widget
 	*/
 	function form( $instance )
 	{
-		if ( !isset($instance['source']) || empty($instance['source']) )
-			$instance['source'] == 'links';
-
-		echo '<div class="links_slideshow_control">';
+		if ( !isset($instance['source']) || empty($instance['source']) ) {
+			$instance = array('source' => 'links', 'category' => '', 'post_url_meta' => '', 'post_img_meta' => '', 'title' => '', 'width' => '', 'height' => '', 'timeout' => '', 'speed' => '', 'fade' => '', 'order' => 0);
+		}
+		
+		echo '<div class="links-slideshow-control">';
 		echo '<p><label for="'.$this->get_field_id('source').'">'.__( 'Source', 'sponsors-slideshow' ).'</label>'.$this->sources($instance['source']).'</p>';
 		echo '<p><label for="'.$this->get_field_id('post_category').'">'.__( 'Category', 'sponsors-slideshow' ).'</label> '.$this->categories($instance['category']).'</p>';
 		echo '<p><label for="'.$this->get_field_id('post_url_meta').'">'.__( 'URL Field', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('post_url_meta').'" id="'.$this->get_field_id('post_url_meta').'" value="'.$instance['post_url_meta'].'" size="10" /> '.__('Post Meta-Field for Link URL', 'sponsors-slideshow').'</p>';
@@ -335,7 +337,19 @@ class SponsorsSlideshowWidget extends WP_Widget
 
 
 	/**
-	 * add stylesheet and scripts
+	 * add stylesheet
+	 *
+	 * @param none
+	 * @return void
+	 */
+	function addStyles()
+	{
+		wp_enqueue_style( 'sponsors-slideshow', $this->plugin_url.'/style.css', array(), $this->version, 'all' );
+	}
+	
+	
+	/**
+	 * add scripts
 	 *
 	 * @param none
 	 * @return void
@@ -343,7 +357,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	function addScripts()
 	{
 		wp_enqueue_style( 'sponsors-slideshow', $this->plugin_url.'/style.css', array(), $this->version, 'all' );
-		wp_enqueue_script( 'sponsors-slideshow-jquery', $this->plugin_url.'/js/jquery.cycle.all.js', array('jquery'), '2.65' );
+		wp_enqueue_script( 'jquery_slideshow', $this->plugin_url.'/js/jquery.cycle.all.js', array('jquery'), '2.65' );
 	}
 	
 	
