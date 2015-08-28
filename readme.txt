@@ -3,22 +3,26 @@ Contributors: Kolja Schleich
 Tags: plugin, sidebar, widget, sponsor links, slideshow
 Requires at least: 2.8
 Tested up to: 4.3
-Stable tag: 2.1.5
+Stable tag: 2.1.6
 
 Widget to display a certain link category with images as slide show.
 
 == Description ==
 
-Display a slide show of certain link categories in widgets. 
-Since Wordpress 3.5 the standard Link Manager has been deactivated. The official plugin [Link Manager](https://wordpress.org/plugins/link-manager/) is required for this plugin to work.
+Include [jQuery](http://malsup.com/jquery/cycle) slideshows on your website in an instance
 
-It can display a certain link category as slide show in the sidebar, using the [jQuery Cycle Plugin](http://malsup.com/jquery/cycle). It automatically excludes the chosen slideshow category from the Wordpress internal links widget. Below is a list of options.
-
-* set width an height of the slide show
+* multiple sources for slideshows including links, images or posts
+* enable featured images for posts (post-thumbnail)
+* enable categories for images
+* set width an height of the slideshow
 * specify time out between transitions and time of transition
 * choose from several different fade effects
 * random or ordered slide show
+* include manual navigation
 * multiple widget support
+* exclude the chosen slideshow links category from the Wordpress internal links widget
+
+Since Wordpress 3.5 the standard Link Manager has been deactivated. The official plugin [Link Manager](https://wordpress.org/plugins/link-manager/) is required for this plugin to work.
 
 == Installation ==
 
@@ -31,11 +35,38 @@ To install the plugin to the following steps
 5. If Source is "Posts" you need to setup custom fields in the post page and insert respective names holding image url target page url (see Screenshots)
 
 == Screenshots ==
-1. Slideshow widget settings. The URL and Image Fields (below category dropdown) are only required if Source is Posts
-2. Custom fields for posts containing image url and target page url
+1. Slideshow widget settings
+2. Set featured images in posts
 3. Link Management
 
+== HowTo ==
+Include jQuery slideshows on your website in an instance. The plugin offers different sources for generating slideshows including links, images or posts
+
+=== Links ===
+1. First install the plugin [Link Manager](https://wordpress.org/plugins/link-manager/) to re-enable the WordPress link system
+2. Create at least one category and add links including Image Address
+3. Choose Links as source and corresponding links category in the widget settings page
+
+=== Images ===
+1. The plugin enables categorization of media
+2. Upload images and add the desired images to a category
+3. Choose Images as source and corresponding images/posts category in the widget settings page
+
+=== Posts ===
+1. Add featured images to posts
+2. Choose Posts as source and corresponding images/posts category in the widget settings page
+3. In addition to the featured image, post title and an excerpt are displayed above linking to the post
+
+
 == ChangeLog ==
+
+= 2.1.6 =
+* NEW: enable featured image in posts
+* NEW: show featured post slideshow including featured image (post-thumbnail), post title and adjustable post excerpt 
+* NEW: enable categories in attachments and include attachments (images) as source
+* NEW: include previous/next navigation in slideshow, which can be shown or hidden through widget control panel
+* BUGFIX: fixed function to manually display widget
+* BUGFIX: some styling fixes
 
 = 2.1.5 =
 * BUGFIX: fixed not loaded CSS stylesheet in admin panel
