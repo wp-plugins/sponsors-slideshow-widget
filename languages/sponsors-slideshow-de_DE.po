@@ -199,3 +199,54 @@ msgstr "Zufällig"
 msgid "Ordered"
 msgstr "Geordnet"
 
+#: sponsors-slideshow-widget.php
+msgid "Navigation Arrows"
+msgstr "Navigation"
+
+#: sponsors-slideshow-widget.php
+msgid "Post Excerpt"
+msgstr "Beitragsauszug"
+
+#: sponsors-slideshow-widget.php
+msgid "Images"
+msgstr "Bilder"
+
+#: sponsors-slideshow-widget.php
+msgid "Posts"
+msgstr "Beiträge"
+
+#: sponsors-slideshow-widget.php
+msgid "Posts or Images"
+msgstr "Beiträge oder Bilder"
+
+#: sponsors-slideshow-widget.php
+msgid "Latest Posts"
+msgstr "Letzte Beiträge"
+
+#: sponsors-slideshow-widget.php
+msgid "Latest %d posts"
+msgstr "Letzte %d Beiträge"
+
+#: tinymce/window.php
+msgid "Bounding Box"
+msgstr "Rahmen"
+
+#: tinymce/window.php
+msgid "Alignment"
+msgstr "Ausrichtung"
+
+#: tinymce/window.php
+msgid "Floating Left"
+msgstr "Links gleitend"
+
+#: tinymce/window.php
+msgid "Centered"
+msgstr "Zentriert"
+
+#: tinymce/window.php
+msgid "Floating Right"
+msgstr "Rechts gleitend"
+
+#: tinymce/window.php
+msgid "words"
+msgstr "Wörter"

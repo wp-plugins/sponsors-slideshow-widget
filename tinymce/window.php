@@ -135,7 +135,7 @@ global $wpdb;
 			<td><input type="text" name="speed" id="speed" size="4" /> <?php _e('seconds', 'sponsors-slideshow') ?></td>
 		</tr>
 		<tr>
-			<td><label for="fade"><?php _e('Fade Effects', 'sponsors-slideshow') ?></label></td>
+			<td><label for="fade"><?php _e('Fade Effect', 'sponsors-slideshow') ?></label></td>
 			<td>
 				<select size="1" name="fade" id="fade">
 				<?php foreach ( $effects AS $name => $effect ) : ?>
@@ -155,7 +155,7 @@ global $wpdb;
 			</td>
 		</tr>-->
 		<tr>
-			<td><label for="navigation_arrows"><?php _e('Naviation Arrows', 'sponsors-slideshow') ?></label></td>
+			<td><label for="navigation_arrows"><?php _e('Navigation Arrows', 'sponsors-slideshow') ?></label></td>
 			<td>
 				<input type="checkbox" checked="checked" value="1" name="navigation_arrows" id="navigation_arrows" />
 				<label for="bounding_box"><?php _e('Bounding Box', 'sponsors-slideshow') ?></label>
@@ -173,7 +173,7 @@ global $wpdb;
 			</td>
 		</tr>
 		<tr>
-			<td><label for="post_excerpt_length"><?php _e('Post Excerpt Length', 'sponsors-slideshow') ?></label></td>
+			<td><label for="post_excerpt_length"><?php _e('Post Excerpt', 'sponsors-slideshow') ?></label></td>
 			<td><input type="text" name="post_excerpt_length" id="post_excerpt_length" size="4" /> <?php _e('words','sponsors-slideshow') ?></td>
 		</tr>
 		</table>

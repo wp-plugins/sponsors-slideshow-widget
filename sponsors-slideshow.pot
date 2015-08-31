@@ -193,3 +193,55 @@ msgstr ""
 #: sponsors-slideshow-widget.php:294
 msgid "Ordered"
 msgstr ""
+
+#: sponsors-slideshow-widget.php
+msgid "Navigation Arrows"
+msgstr ""
+
+#: sponsors-slideshow-widget.php
+msgid "Post Excerpt"
+msgstr ""
+
+#: sponsors-slideshow-widget.php
+msgid "Images"
+msgstr ""
+
+#: sponsors-slideshow-widget.php
+msgid "Posts"
+msgstr ""
+
+#: sponsors-slideshow-widget.php
+msgid "Posts or Images"
+msgstr ""
+
+#: sponsors-slideshow-widget.php
+msgid "Latest Posts"
+msgstr ""
+
+#: sponsors-slideshow-widget.php
+msgid "Latest %d posts"
+msgstr ""
+
+#: tinymce/window.php
+msgid "Bounding Box"
+msgstr ""
+
+#: tinymce/window.php
+msgid "Alignment"
+msgstr ""
+
+#: tinymce/window.php
+msgid "Floating Left"
+msgstr ""
+
+#: tinymce/window.php
+msgid "Centered"
+msgstr ""
+
+#: tinymce/window.php
+msgid "Floating Right"
+msgstr ""
+
+#: tinymce/window.php
+msgid "words"
+msgstr ""
