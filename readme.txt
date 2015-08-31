@@ -1,9 +1,9 @@
 === Sponsors Slideshow Widget ===
 Contributors: Kolja Schleich
-Tags: plugin, sidebar, widget, sponsor links, slideshow
-Requires at least: 2.8
+Tags: plugin, sidebar, widget, sponsor links, slideshow, featured posts, image slideshow, posts slideshow, shortcode
+Requires at least: 3.3
 Tested up to: 4.3
-Stable tag: 2.1.6
+Stable tag: 2.1.7
 
 Widget to display a certain link category with images as slide show.
 
@@ -59,6 +59,11 @@ Include jQuery slideshows on your website in an instance. The plugin offers diff
 
 
 == ChangeLog ==
+
+= 2.1.7 =
+* NEW: shortcode to display slideshow in post or page including TinyMCE Button
+* NEW: add CSS styles for individual slideshows using wp_add_inline_style()
+* BUGFIX: some small fixes
 
 = 2.1.6 =
 * NEW: enable featured image in posts

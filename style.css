@@ -1,6 +1,27 @@
 /*
  * Slideshow
  */
+.slideshow-shortcode {
+	margin: 1em auto;
+	}
+.slideshow-shortcode.alignleft {
+	float: left;
+	margin: 0em 1em 1em 0;
+	}
+.slideshow-shortcode.alignright {
+	float: right;
+	margin: 0em 0 1em 1em;
+	}
+.slideshow-shortcode.aligncenter:before,
+.slideshow-shortcode.aligncenter:after {
+	content: " ";
+	display: table;
+	clear: both;
+	}
+.slideshow-shortcode.bounding-box > div {
+	border: 1px solid;
+	}
+	
 .links-slideshow-container {
 	position: relative;
 	width: 100%;
@@ -69,12 +90,14 @@
 	margin: 0 auto;
 	padding: 0;
 	z-index: 1;
+	width: 100%;
 	/*position: absolute;
 	top: 0;*/
 }
 .links-slideshow div {
 	position: relative;
 	z-index: 1;
+	width: 100%;
 }
 .links-slideshow .featured-post {
 	position: absolute;
@@ -90,6 +113,7 @@
 	height: 150px;
 	max-height: 150px;
 	width: 100%;
+	color: #000;
 	z-index: 2;
 }
 .links-slideshow .featured-post .featured-post-title {
@@ -107,6 +131,8 @@
 	top: 2em;
 	text-align: justify;
 }
+
+.
 
 /*
  * Widget Control Panel
