@@ -3,7 +3,7 @@
 Plugin Name: Sponsors Slideshow Widget
 Plugin URI: http://www.wordpress.org/extend/plugins/sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 2.1.7
+Version: 2.1.8
 Author: Kolja Schleich
 
 Copyright 2007-2015  Kolja Schleich  (email : kolja [dot] schleich [at] googlemail.com)
@@ -30,7 +30,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '2.1.7';
+	var $version = '2.1.8';
 	
 	/**
 	 * url to the plugin
@@ -63,7 +63,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 			define( 'WP_PLUGIN_URL', WP_CONTENT_URL. '/plugins' );
 			
 		// define plugin url and path
-		$this->plugin_url = WP_PLUGIN_URL.'/'.basename(__FILE__, '.php');
+		$this->plugin_url = esc_url(WP_PLUGIN_URL.'/'.basename(__FILE__, '.php'));
 		$this->plugin_path = dirname(__FILE__);
 		
 		// register installation/deinstallation functions
@@ -95,8 +95,11 @@ class SponsorsSlideshowWidget extends WP_Widget
 		add_action( 'init', array(&$this, 'addTinyMCEButton') );
 		add_filter( 'tiny_mce_version', array(&$this, 'changeTinyMCEVersion') );
 		
+		// re-activate links management
+		add_filter( 'pre_option_link_manager_enabled', '__return_true' );
+		
 		$widget_ops = array('classname' => 'sponsors_slideshow_widget', 'description' => __('Display specific link category as image slide show', 'sponsors-slideshow') );
-		parent::__construct('sponsors-slideshow', __('Sponsors Slideshow', 'sponsors-slideshow'), $widget_ops);
+		parent::__construct('sponsors-slideshow', __('Slideshow', 'sponsors-slideshow'), $widget_ops);
 	}
 	function SponsorsSlideshowWidget()
 	{
@@ -117,7 +120,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	function widget( $args, $instance )
 	{
 		$defaults = array(
-			'before_widget' => '<li id="sponsors-slideshow-widget-'.$this->number.'" class="widget '.get_class($this).'_'.__FUNCTION__.'">',
+			'before_widget' => '<li id="sponsors-slideshow-widget-'.$this->number.'" class="widget sponsors_slideshow_widget">',
 			'after_widget' => '</li>',
 			'before_title' => '<h2 class="widgettitle">',
 			'after_title' => '</h2>',
@@ -152,11 +155,11 @@ class SponsorsSlideshowWidget extends WP_Widget
 			<script type='text/javascript'>
 			//<![CDATA[
 			//jQuery(document).ready(function() {
-				jQuery('#links-slideshow-<?php echo $number ?>').cycle({
+				jQuery('#fancy-slideshow-<?php echo $number ?>').cycle({
 					fx: '<?php echo $instance['fade']; ?>',
 					timeout: <?php echo intval($instance['timeout'])*1000; ?>,
-					next: '#sponsors-slideshow-<?php echo $number ?>-next',
-					prev: '#sponsors-slideshow-<?php echo $number ?>-prev',
+					next: '#fancy-slideshow-<?php echo $number ?>-next',
+					prev: '#fancy-slideshow-<?php echo $number ?>-prev',
 					speed: <?php echo intval($instance['speed'])*1000; ?>,
 					random: <?php echo intval($instance['order']); ?>,
 					pause: 1
@@ -174,12 +177,12 @@ class SponsorsSlideshowWidget extends WP_Widget
 			/*elseif ( $instance['title'] == 'N/A' )
 				echo "<br style='clear: both;' />"; // Fix for IE*/
 				
-			echo '<div id="links-slideshow-'.$number.'-container" class="links-slideshow-container">';
+			echo '<div id="fancy-slideshow-'.$number.'-container" class="fancy-slideshow-container">';
 			
 			if (isset($instance['show_navigation']) && $instance['show_navigation'] == 1)
-			echo '<a href="#" class="prev" id="sponsors-slideshow-'.$number.'-prev"><span>&laquo;</span></a>';
+			echo '<a href="#" class="prev" id="fancy-slideshow-'.$number.'-prev"><span>&laquo;</span></a>';
 			
-			echo '<div id="links-slideshow-'.$number.'" class="links-slideshow">';
+			echo '<div id="fancy-slideshow-'.$number.'" class="fancy-slideshow">';
 			foreach ( $results AS $item ) {
 				if ( $instance['source'] == 'links' ) {
 					$item->name = $item->link_name;
@@ -213,22 +216,22 @@ class SponsorsSlideshowWidget extends WP_Widget
 
 				
 				if ( $item->image != "" )
-					$text = sprintf('<img src="%s" alt="%s" />', $item->image, $item->name);
+					$text = sprintf('<img src="%s" alt="%s" />', esc_url($item->image), $item->name);
 				else
 					$text = $item->name;
 				
-				echo '<div>';
+				echo '<div class="slideshow-content">';
 				
 				if ( $item->url != '' ) {
 					$target = ($item->url_target != "") ? 'target="'.$item->url_target.'"' : '';
-					printf('<a href="%s" %s title="%s">%s</a>', $item->url, $target, $item->name, $text);
+					printf('<a href="%s" %s title="%s">%s</a>', esc_url($item->url), $target, $item->name, $text);
 				} else {
 					echo $text;
 				}
 				
 				if ( $instance['source'] == 'posts' ) {
 					echo "<div class='featured-post'>";
-					echo "<p class='featured-post-title'>".get_the_title($item->ID).'</p>';
+					echo "<h2 class='featured-post-title'>".get_the_title($item->ID).'</h2>';
 					echo "<p class='featured-post-excerpt'>".$this->getPostExcerpt($item->ID, $instance['post_excerpt_length'])."</p>";
 					echo "</div>";
 				}
@@ -238,7 +241,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 			echo '</div>';
 			
 			if (isset($instance['show_navigation']) && $instance['show_navigation'] == 1)
-			echo '<a href="#" class="next" id="sponsors-slideshow-'.$number.'-next"><span>&raquo</span></a>';
+			echo '<a href="#" class="next" id="fancy-slideshow-'.$number.'-next"><span>&raquo</span></a>';
 		
 			echo '</div>';
 			echo $after_widget;
@@ -346,10 +349,9 @@ class SponsorsSlideshowWidget extends WP_Widget
 			$instance = array('source' => 'links', 'category' => '', 'show_navigation' => 0, 'post_excerpt_length' => 0,  'num_latest_posts' => 0, 'title' => '', 'width' => '', 'height' => '', 'timeout' => '', 'speed' => '', 'fade' => '', 'order' => 0);
 		}
 		
-		echo '<div class="links-slideshow-control">';
+		echo '<div class="fancy-slideshow-control">';
 		echo '<p><label for="'.$this->get_field_id('source').'">'.__( 'Source', 'sponsors-slideshow' ).'</label>'.$this->sources($instance['source']).'</p>';
 		echo '<p><label for="'.$this->get_field_id('post_category').'">'.__( 'Category', 'sponsors-slideshow' ).'</label> '.$this->categories($instance['category']).'</p>';
-		//echo '<p><label for="'.$this->get_field_id('num_latest_posts').'">'.__( 'Latest Posts', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('num_latest_posts').'" id="'.$this->get_field_id('num_latest_posts').'" value="'.$instance['num_latest_posts'].'" size="3" /> '.__('If > 0 Category is ignored', 'sponsors-slideshow').'</p>';
 		echo '<p><label for="'.$this->get_field_id('title').'">'.__('Title', 'sponsors-slideshow').'</label><input type="text" size="15" name="'.$this->get_field_name('title').'" id="'.$this->get_field_id('title').'" value="'.stripslashes($instance['title']).'" /></p>';
 		echo '<p><label for="'.$this->get_field_id('width').'">'.__( 'Width', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="'.$this->get_field_name('width').'" id="'.$this->get_field_id('width').'" value="'.intval($instance['width']).'" /> px</p>';
 		echo '<p><label for="'.$this->get_field_id('height').'">'.__( 'Height', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="'.$this->get_field_name('height').'" id="'.$this->get_field_id('height').'" value="'.intval($instance['height']).'" /> px</p>';
@@ -500,7 +502,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 */
 	function addStyles()
 	{
-		wp_enqueue_style( 'sponsors-slideshow', $this->plugin_url.'/style.css', array(), $this->version, 'all' );
+		wp_enqueue_style( 'fancy-slideshow', $this->plugin_url.'/style.css', array(), $this->version, 'all' );
 	}
 	
 	
@@ -515,12 +517,12 @@ class SponsorsSlideshowWidget extends WP_Widget
 		$options = get_option('widget_sponsors-slideshow');
 		unset($options['_multiwidget']);
 		
-		wp_enqueue_style( 'sponsors-slideshow', $this->plugin_url.'/style.css', array(), $this->version, 'all' );
+		wp_enqueue_style( 'fancy-slideshow', $this->plugin_url.'/style.css', array(), $this->version, 'all' );
 		wp_enqueue_script( 'jquery_slideshow', $this->plugin_url.'/js/jquery.cycle.all.js', array('jquery'), '2.65' );
 		
 		// add inline CSS for each slideshow widget
 		foreach ($options AS $number => $instance)
-			wp_add_inline_style( 'sponsors-slideshow', $this->getSlideshowCSS($number, $instance) );
+			wp_add_inline_style( 'fancy-slideshow', $this->getSlideshowCSS($number, $instance) );
 	}
 	
 	
@@ -533,21 +535,25 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 */
 	function getSlideshowCSS( $number, $instance )
 	{
-		$css = "#links-slideshow-".$number." div, #links-slideshow-". $number ." img, #links-slideshow-".$number."-container { ";
+		$css = "#fancy-slideshow-".$number."-container, #fancy-slideshow-".$number."-container img { ";
 		if (intval($instance['height']) > 0) {
-			$css .= "height: ".intval($instance['height'])."px;";
+			//$css .= "height: ".intval($instance['height'])."px;";
+			$css .= "max-height: ".intval($instance['height'])."px;";
 		}
 		if (intval($instance['width']) > 0) {
-			$css .= "width: ".intval($instance['width'])."px !important; max-width: ".intval($instance['width'])."px !important;";
-		} else {
-			$css .= "width: 100% !important; max-width: 100% !important;";
+			//$css .= "width: ".intval($instance['width'])."px;";
+			$css .= "max-width: ".intval($instance['width'])."px;";
 		}
 
 		$css .= " }";
 			
 		if (intval($instance['height']) > 0) {
-			$css .= "\n#links-slideshow-".$number." .featured-post { height: ".intval($instance['height'])/3 . "px !important; max-height: ".intval($instance['height'])/3 ."px !important; }\n";
-			$css .= "#links-slideshow-".$number." .links-slideshow-container .next, #links-slideshow-".$number." .links-slideshow-container .prev { top: ".intval($instance['height']-25)/2 ."px; }";
+			$css .= "\n#fancy-slideshow-".$number."-container .featured-post {";
+			//$css .= "height: ".intval($instance['height'])/3 . "px !important;";
+			$css .= "max-height: ".intval($instance['height'])/3 ."px !important; }\n";
+			$css .= "#fancy-slideshow-".$number." .fancy-slideshow-container .next, #fancy-slideshow-".$number." .fancy-slideshow-container .prev {";
+			$css .= "top: ".intval($instance['height']-25)/2 ."px;";
+			$css .= "}";
 		}
 			
 		return $css;
@@ -565,16 +571,18 @@ class SponsorsSlideshowWidget extends WP_Widget
 		$options = get_option('widget_sponsors-slideshow');
 		unset($options['_multiwidget']);
 		$excludes = array();
-		foreach ( (array)$options AS $option ) {
-			// exclude only categories from links source
-			if ( $option['source'] == 'links' ) {
-				$cat = explode("_", $option['category']);
-				$excludes[] = $cat[2];
+		if (count($options) > 0) {
+			foreach ( (array)$options AS $option ) {
+				// exclude only categories from links source
+				if ( $option['source'] == 'links' ) {
+					$cat = explode("_", $option['category']);
+					$excludes[] = $cat[2];
+				}
 			}
+			
+			$exclude = implode(',', $excludes);
+			$args['exclude_category'] = $exclude;
 		}
-		
-		$exclude = implode(',', $excludes);
-		$args['exclude_category'] = $exclude;
 		return $args;
 	 }
 	 
@@ -589,17 +597,19 @@ class SponsorsSlideshowWidget extends WP_Widget
 		$options = get_option('widget_sponsors-slideshow');
 		unset($options['_multiwidget']);
 		$excludes = array();
-		foreach ( (array)$options AS $option ) {
-			// exclude categories from widget only if source is images
-			if ($option['source'] == 'images') {
-				$cat = explode("_", $option['category']);
-				if (isset($cat[1]))
-					$excludes[] = $cat[1];
+		if (count($options) > 0) {
+			foreach ( (array)$options AS $option ) {
+				// exclude categories from widget only if source is images
+				if ($option['source'] == 'images') {
+					$cat = explode("_", $option['category']);
+					if (isset($cat[1]))
+						$excludes[] = $cat[1];
+				}
 			}
+			
+			$exclude = implode(',', $excludes);
+			$args["exclude"] = $exclude;
 		}
-		
-		$exclude = implode(',', $excludes);
-		$args["exclude"] = $exclude;
 		return $args;
 	}
 	
@@ -615,25 +625,27 @@ class SponsorsSlideshowWidget extends WP_Widget
 		unset($options['_multiwidget']);
 		$cat_ids = array();
 		$num = array();
-		foreach ($options AS $option) {
-			if ($option['source'] == 'posts') {
-				$cat = explode("_", $option['category']);
-				// Exclude n latest posts or posts from selected category
-				if ($cat[0] == 'latest') {
-					$num[] = intval($cat[1]);
-				} else {
-					$cat_ids[] = "-".$cat[1];
+		if (count($options) > 0) {
+			foreach ($options AS $option) {
+				if ($option['source'] == 'posts') {
+					$cat = explode("_", $option['category']);
+					// Exclude n latest posts or posts from selected category
+					if ($cat[0] == 'latest') {
+						$num[] = intval($cat[1]);
+					} else {
+						$cat_ids[] = "-".$cat[1];
+					}
 				}
 			}
-		}
-		$cat = implode(",", $cat_ids);
+			$cat = implode(",", $cat_ids);
 
-		if ( $query->is_home() && $query->is_main_query() ) {
-			if (count($cat_ids) > 0)
-				$query->set( 'cat', $cat );
-		
-			foreach ($num AS $n)
-				$query->set( 'offset', $n );			
+			if ( $query->is_home() && $query->is_main_query() ) {
+				if (count($cat_ids) > 0)
+					$query->set( 'cat', $cat );
+			
+				foreach ($num AS $n)
+					$query->set( 'offset', $n );			
+			}
 		}
 	}
 	
