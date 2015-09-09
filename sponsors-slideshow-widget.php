@@ -535,27 +535,29 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 */
 	function getSlideshowCSS( $number, $instance )
 	{
-		$css = "#fancy-slideshow-".$number."-container, #fancy-slideshow-".$number."-container img { ";
-		if (intval($instance['height']) > 0) {
-			//$css .= "height: ".intval($instance['height'])."px;";
-			$css .= "max-height: ".intval($instance['height'])."px;";
-		}
-		if (intval($instance['width']) > 0) {
-			//$css .= "width: ".intval($instance['width'])."px;";
-			$css .= "max-width: ".intval($instance['width'])."px;";
-		}
+		$css = "";
+		if (intval($instance['height']) > 0 || intval($instance['width']) > 0) {
+			$css .= "#fancy-slideshow-".$number."-container, #fancy-slideshow-".$number."-container img { ";
+			if (intval($instance['height']) > 0) {
+				//$css .= "height: ".intval($instance['height'])."px;";
+				$css .= "max-height: ".intval($instance['height'])."px;";
+			}
+			if (intval($instance['width']) > 0) {
+				//$css .= "width: ".intval($instance['width'])."px;";
+				$css .= "max-width: ".intval($instance['width'])."px;";
+			}
 
-		$css .= " }";
-			
-		if (intval($instance['height']) > 0) {
-			$css .= "\n#fancy-slideshow-".$number."-container .featured-post {";
-			//$css .= "height: ".intval($instance['height'])/3 . "px !important;";
-			$css .= "max-height: ".intval($instance['height'])/3 ."px !important; }\n";
-			$css .= "#fancy-slideshow-".$number." .fancy-slideshow-container .next, #fancy-slideshow-".$number." .fancy-slideshow-container .prev {";
-			$css .= "top: ".intval($instance['height']-25)/2 ."px;";
-			$css .= "}";
+			$css .= " }";
+				
+			if (intval($instance['height']) > 0) {
+				$css .= "\n#fancy-slideshow-".$number."-container .featured-post {";
+				//$css .= "height: ".intval($instance['height'])/3 . "px !important;";
+				$css .= "max-height: ".intval($instance['height'])/3 ."px !important; }\n";
+				$css .= "#fancy-slideshow-".$number." .fancy-slideshow-container .next, #fancy-slideshow-".$number." .fancy-slideshow-container .prev {";
+				$css .= "top: ".intval($instance['height']-25)/2 ."px;";
+				$css .= "}";
+			}
 		}
-			
 		return $css;
 	}
 	
