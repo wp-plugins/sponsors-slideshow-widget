@@ -195,7 +195,15 @@ msgid "Ordered"
 msgstr ""
 
 #: sponsors-slideshow-widget.php
-msgid "Navigation Arrows"
+msgid "Navigation"
+msgstr ""
+
+#: sponsors-slideshow-widget.php
+msgid "Pager"
+msgstr ""
+
+#: sponsors-slideshow-widget.php
+msgid "Arrows"
 msgstr ""
 
 #: sponsors-slideshow-widget.php

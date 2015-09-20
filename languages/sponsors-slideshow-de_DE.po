@@ -201,7 +201,23 @@ msgstr "Geordnet"
 
 #: sponsors-slideshow-widget.php
 msgid "Navigation Arrows"
+msgstr "Navigation Pfeile"
+
+#: sponsors-slideshow-widget.php
+msgid "Navigation Pager"
+msgstr "Navigation Pager"
+
+#: sponsors-slideshow-widget.php
+msgid "Navigation"
 msgstr "Navigation"
+
+#: sponsors-slideshow-widget.php
+msgid "Pager"
+msgstr "Pager"
+
+#: sponsors-slideshow-widget.php
+msgid "Arrows"
+msgstr "Pfeile"
 
 #: sponsors-slideshow-widget.php
 msgid "Post Excerpt"

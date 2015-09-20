@@ -3,7 +3,7 @@ Contributors: Kolja Schleich
 Tags: plugin, sidebar, widget, sponsor links, slideshow, featured posts, image slideshow, posts slideshow, shortcode
 Requires at least: 3.3
 Tested up to: 4.3
-Stable tag: 2.1.8
+Stable tag: 2.2.1
 
 Add fancy slideshows to your website in an instance
 
@@ -55,6 +55,18 @@ Include jQuery slideshows on your website in an instance. The plugin offers diff
 In order to force full-width display of slideshows simply set with to 0px. The same applies to automatic slideshow height.
 
 == ChangeLog ==
+
+= 2.2.1 =
+* UPDATE: some styling updates
+
+= 2.2 =
+* NEW: optional pager navigation
+* NEW: Allow floating numbers for speed and timeout
+* NEW: changed default css style of slideshow container to overflow: scroll to make slideshow work without javascript. Will be changed to hidden if javascript is active
+* BUGFIX: fixed only getting three items for images and posts from category
+
+= 2.1.9 =
+* BUGFIX: fixed issue that link category is not correctly selected
 
 = 2.1.8 =
 * NEW: Re-activate old Links Management System
