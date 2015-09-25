@@ -3,7 +3,7 @@
 Plugin Name: Sponsors Slideshow Widget
 Plugin URI: http://www.wordpress.org/extend/plugins/sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 2.2.2
+Version: 2.2.3
 Author: Kolja Schleich
 
 Copyright 2007-2015  Kolja Schleich  (email : kolja [dot] schleich [at] googlemail.com)
@@ -30,7 +30,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '2.2.2';
+	var $version = '2.2.3';
 	
 	/**
 	 * url to the plugin
@@ -78,7 +78,10 @@ class SponsorsSlideshowWidget extends WP_Widget
 		add_action( 'admin_enqueue_scripts', array(&$this, 'addStyles') );
 		
 		// enable categories for attachments/media
-		add_action( 'init' , array(&$this, 'addCategoriesToAttachments') );
+		//add_action( 'init' , array(&$this, 'addCategoriesToAttachments') );
+		
+		// add new gallery taxonomy
+		add_action( 'init', array(&$this, 'addTaxonomy') );
 		
 		// filter posts query
 		add_action( 'pre_get_posts', array(&$this, 'exclude_posts') );
@@ -104,6 +107,39 @@ class SponsorsSlideshowWidget extends WP_Widget
 	function SponsorsSlideshowWidget()
 	{
 		$this->__construct();
+	}
+	
+	
+	/**
+	 * add new gallery taxonomy for grouping images
+	 *
+	 * @param none
+	 */
+	function addTaxonomy()
+	{
+		$labels = array(
+			'name'              => __('Galleries', 'sponsors-slideshow'),
+			'singular_name'     => __('Gallery', 'sponsors-slideshow'),
+			'search_items'      => __('Search Galleries', 'sponsors-slideshow'),
+			'all_items'         => __('All Galleries', 'sponsors-slideshow'),
+			'parent_item'       => __('Parent Gallery', 'sponsors-slideshow'),
+			'parent_item_colon' => __('Parent Gallery:', 'sponsors-slideshow'),
+			'edit_item'         => __('Edit Gallery', 'sponsors-slideshow'),
+			'update_item'       => __('Update Gallery', 'sponsors-slideshow'),
+			'add_new_item'      => __('Add New Gallery', 'sponsors-slideshow'),
+			'new_item_name'     => __('New Gallery Name', 'sponsors-slideshow'),
+			'menu_name'         => __('Galleries', 'sponsors-slideshow')
+		);
+
+		$args = array(
+			'labels' => $labels,
+			'hierarchical' => true,
+			'query_var' => 'true',
+			'rewrite' => 'true',
+			'show_admin_column' => 'true',
+		);
+
+		register_taxonomy( 'gallery', 'attachment', $args );
 	}
 	
 	
@@ -145,7 +181,19 @@ class SponsorsSlideshowWidget extends WP_Widget
 			}
 			$results = $query->posts;
 		} elseif ( $instance['source'] == 'images' ) {
-			$query = new WP_Query(array('posts_per_page' => -1, 'post_type' => 'attachment', 'post_status' => 'inherit', 'cat' => $term_id));
+			//$query = new WP_Query(array('posts_per_page' => -1, 'post_type' => 'attachment', 'post_status' => 'inherit', 'cat' => $term_id));
+			$query = new WP_Query(array(
+				'posts_per_page' => -1,
+				'post_type' => 'attachment',
+				'post_status' => 'inherit',
+				'tax_query' => array(
+					array(
+						'taxonomy' => 'gallery',
+						'field' => 'term_id',
+						'terms' => $term_id
+					)
+				)
+			));
 			$results = $query->posts;
 		} else {
 			$results = false;
@@ -426,7 +474,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	function categories( $selected )
 	{
 		$out = '<select size="1" name="'.$this->get_field_name("category").'" id="'.$this->get_field_id("category").'">';
-		$terms = array("Links" => "link_category", "Posts or Images" => "category");
+		$terms = array("Links" => "link_category", "Posts" => "category", "Images" => "gallery");
 		
 		foreach ($terms AS $label => $term) {
 			$categories = get_terms($term, 'orderby=name&hide_empty=0');

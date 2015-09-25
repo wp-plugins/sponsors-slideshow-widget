@@ -14,6 +14,46 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+# sponsors-slideshow-widget.php
+msgid "Galleries"
+msgstr "Galerien"
+
+# sponsors-slideshow-widget.php
+msgid "Gallery"
+msgstr "Galerie"
+
+# sponsors-slideshow-widget.php
+msgid "Search Galleries"
+msgstr "Galerien durchsuchen"
+
+# sponsors-slideshow-widget.php
+msgid "All Galleries"
+msgstr "Alle Galerien"
+
+# sponsors-slideshow-widget.php
+msgid "Parent Gallery"
+msgstr "Eltern Galerie"
+
+# sponsors-slideshow-widget.php
+msgid "Parent Gallery:"
+msgstr "Eltern Galerie:"
+
+# sponsors-slideshow-widget.php
+msgid "Edit Gallery"
+msgstr "Galerie bearbeiten"
+
+# sponsors-slideshow-widget.php
+msgid "Update Gallery"
+msgstr "Galerie aktualisieren"
+
+# sponsors-slideshow-widget.php
+msgid "Add New Gallery"
+msgstr "Neue Galerie hinzufügen"
+
+# sponsors-slideshow-widget.php
+msgid "New Gallery Name"
+msgstr "Neue Galerie Name"
+
 #: sponsors-slideshow-widget.php:96
 msgid "Sponsors Slideshow"
 msgstr "Sponsors Slideshow"

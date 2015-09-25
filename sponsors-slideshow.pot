@@ -14,6 +14,46 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+# sponsors-slideshow-widget.php
+msgid "Galleries"
+msgstr ""
+
+# sponsors-slideshow-widget.php
+msgid "Gallery"
+msgstr ""
+
+# sponsors-slideshow-widget.php
+msgid "Search Galleries"
+msgstr ""
+
+# sponsors-slideshow-widget.php
+msgid "All Galleries"
+msgstr ""
+
+# sponsors-slideshow-widget.php
+msgid "Parent Gallery"
+msgstr ""
+
+# sponsors-slideshow-widget.php
+msgid "Parent Gallery:"
+msgstr ""
+
+# sponsors-slideshow-widget.php
+msgid "Edit Gallery"
+msgstr ""
+
+# sponsors-slideshow-widget.php
+msgid "Update Gallery"
+msgstr ""
+
+# sponsors-slideshow-widget.php
+msgid "Add New Gallery"
+msgstr ""
+
+# sponsors-slideshow-widget.php
+msgid "New Gallery Name"
+msgstr ""
+
 #: sponsors-slideshow-widget.php:69
 msgid "Display specific link category as image slide show"
 msgstr ""

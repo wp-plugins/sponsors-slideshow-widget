@@ -3,7 +3,7 @@ Contributors: Kolja Schleich
 Tags: plugin, sidebar, widget, sponsor links, slideshow, featured posts, image slideshow, posts slideshow, shortcode
 Requires at least: 3.3
 Tested up to: 4.3
-Stable tag: 2.2.2
+Stable tag: 2.2.3
 
 Add fancy slideshows to your website in an instance
 
@@ -16,7 +16,7 @@ Include [jQuery](http://malsup.com/jquery/cycle) slideshows on your website in a
 * Re-activate WordPress Link Management System
 * Enable featured images for posts (post-thumbnail)
 * Multiple widgets and shortcode
-* Enable categories for images
+* Enable custom gallery taxonomy for images
 * Easy customization slideshows 
 * Include manual navigation
 * Exclude the chosen slideshow links category from the Wordpress internal links widget
@@ -33,6 +33,7 @@ To install the plugin do the following steps
 2. Set featured images in posts
 3. Link Management
 4. Media Management
+5. Featured Posts Slideshow
 
 == Credits ==
 The icons were designed by Yusuke Kamiyamane (http://p.yusukekamiyamane.com/)
@@ -58,6 +59,9 @@ Include jQuery slideshows on your website in an instance. The plugin offers diff
 In order to force full-width display of slideshows simply set with to 0px. The same applies to automatic slideshow height.
 
 == ChangeLog ==
+
+= 2.2.3 =
+* NEW: add custom gallery taxonomy for image categorization. Images need to be re-assigned to galleries. This has been changed to avoid categories only with image attachments in categories widget
 
 = 2.2.2 =
 * UPDATE: updated TinyMCE Button for shortcode
