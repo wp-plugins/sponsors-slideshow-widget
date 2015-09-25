@@ -32,7 +32,8 @@ function SponsorsSlideshowInsertLink() {
 	var timeout = document.getElementById('timeout').value;
 	var speed = document.getElementById('speed').value;
 	var fade = document.getElementById('fade').value;
-	var navigation = getCheckedValue(document.getElementById('navigation_arrows'));
+	var navigation_arrows = getCheckedValue(document.getElementById('navigation_arrows'));
+	var navigation_pager = getCheckedValue(document.getElementById('navigation_pager'));
 	var bounding_box = getCheckedValue(document.getElementById('bounding_box'));
 	var alignment = document.getElementById('alignment').value;
 	var post_excerpt_length = document.getElementById('post_excerpt_length').value;
@@ -41,11 +42,12 @@ function SponsorsSlideshowInsertLink() {
 		bounding_box = 'true';
 	else
 		bounding_box = 'false';
+	
 
 	if (post_excerpt_length != "")
 		post_excerpt_length = ' post_excerpt_length=' + post_excerpt_length;
 	
-	tagtext = "[slideshow source=" + source + " category=" + category + " random=" + order + " width=" + width + " height=" + height + " timeout=" + timeout + " speed=" + speed + " fade=" + fade + " show_navigation=" + navigation + " box=" + bounding_box + " align=" + alignment + post_excerpt_length + "]";
+	tagtext = "[slideshow source=" + source + " category=" + category + " random=" + order + " width=" + width + " height=" + height + " timeout=" + timeout + " speed=" + speed + " fade=" + fade + " show_navigation_arrows=" + navigation_arrows + " show_pager=" + navigation_pager + " box=" + bounding_box + " align=" + alignment + post_excerpt_length + "]";
 
 	if(window.tinyMCE) {
 		/* get the TinyMCE version to account for API diffs */

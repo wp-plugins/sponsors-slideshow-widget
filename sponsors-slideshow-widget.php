@@ -3,7 +3,7 @@
 Plugin Name: Sponsors Slideshow Widget
 Plugin URI: http://www.wordpress.org/extend/plugins/sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 2.2.1
+Version: 2.2.2
 Author: Kolja Schleich
 
 Copyright 2007-2015  Kolja Schleich  (email : kolja [dot] schleich [at] googlemail.com)
@@ -30,7 +30,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '2.2.1';
+	var $version = '2.2.2';
 	
 	/**
 	 * url to the plugin
@@ -88,7 +88,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 		
 		// filter links and categories
 		add_filter( 'widget_links_args', array($this, 'widget_links_args') );
-		//add_filter("widget_categories_args", array(&$this, "widget_categories_arg"));
+		add_filter("widget_categories_args", array(&$this, "widget_categories_arg"));
 		
 		// add shortcode and TinyMCE Button
 		add_shortcode( 'slideshow', array(&$this, 'shortcode') );
@@ -176,21 +176,21 @@ class SponsorsSlideshowWidget extends WP_Widget
 			//]]>
 			</script>
 			<?php
-			echo $before_widget;
+			$out = $before_widget;
 
 			if (!isset($instance['title'])) $instance['title'] = '';
 			
 			if ( !empty($instance['title']) )
-				echo $before_title . stripslashes($instance['title']) . $after_title;
+				$out .= $before_title . stripslashes($instance['title']) . $after_title;
 			/*elseif ( $instance['title'] == 'N/A' )
 				echo "<br style='clear: both;' />"; // Fix for IE*/
 				
-			echo '<div id="fancy-slideshow-'.$number.'-container" class="fancy-slideshow-container">';
+			$out .= '<div id="fancy-slideshow-'.$number.'-container" class="fancy-slideshow-container">';
 			
 			if (isset($instance['show_navigation_arrows']) && $instance['show_navigation_arrows'] == 1)
-			echo '<a href="#" class="prev" id="fancy-slideshow-'.$number.'-prev"><span>&laquo;</span></a>';
+			$out .= '<a href="#" class="prev" id="fancy-slideshow-'.$number.'-prev"><span>&laquo;</span></a>';
 			
-			echo '<div id="fancy-slideshow-'.$number.'" class="fancy-slideshow">';
+			$out .= '<div id="fancy-slideshow-'.$number.'" class="fancy-slideshow">';
 			
 			$i = 0;
 			foreach ( $results AS $item ) {
@@ -232,39 +232,44 @@ class SponsorsSlideshowWidget extends WP_Widget
 				else
 					$text = $item->name;
 				
-				echo '<div id="slideshow-'.$number.'-item-'.$i.'" class="slideshow-content">';
+				$out .= '<div id="slideshow-'.$number.'-item-'.$i.'" class="slideshow-content">';
 				
 				if ( $item->url != '' ) {
 					$target = ($item->url_target != "") ? 'target="'.$item->url_target.'"' : '';
-					printf('<a href="%s" %s title="%s">%s</a>', esc_url($item->url), $target, $item->name, $text);
+					$out .= sprintf('<a href="%s" %s title="%s">%s</a>', esc_url($item->url), $target, $item->name, $text);
 				} else {
-					echo $text;
+					$out .= $text;
 				}
 				
 				if ( $instance['source'] == 'posts' ) {
-					echo "<div class='featured-post'>";
-					echo "<h2 class='featured-post-title'>".get_the_title($item->ID).'</h2>';
-					echo "<p class='featured-post-excerpt'>".$this->getPostExcerpt($item->ID, $instance['post_excerpt_length'])."</p>";
-					echo "</div>";
+					$out .= "<div class='featured-post'>";
+					$out .= "<h2 class='featured-post-title'>".get_the_title($item->ID).'</h2>';
+					$out .= "<p class='featured-post-excerpt'>".$this->getPostExcerpt($item->ID, $instance['post_excerpt_length'])."</p>";
+					$out .= "</div>";
 				}
 				
-				echo '</div>';
+				$out .= '</div>';
 			}
-			echo '</div>';
+			$out .= '</div>';
 			
 			// Slideshow Button Navigation
 			if (isset($instance['show_pager']) && $instance['show_pager'] == 1) {
 				// Each link is 30px in width with 5px margin left and right
 				$max_width = 40 * count($results);
 				$class = ( $instance['source'] == 'posts' ) ? 'posts' : '';
-				echo '<div class="fancy-slideshow-nav-container '.$class.'"><nav id="fancy-slideshow-nav-'.$number.'" class="fancy-slideshow-nav" style="max-width: '.$max_width.'px"></nav></div>';
+				$out .= '<div class="fancy-slideshow-nav-container '.$class.'"><nav id="fancy-slideshow-nav-'.$number.'" class="fancy-slideshow-nav" style="max-width: '.$max_width.'px"></nav></div>';
 			}
 			
 			if (isset($instance['show_navigation_arrows']) && $instance['show_navigation_arrows'] == 1)
-			echo '<a href="#" class="next" id="fancy-slideshow-'.$number.'-next"><span>&raquo</span></a>';
+			$out .= '<a href="#" class="next" id="fancy-slideshow-'.$number.'-next"><span>&raquo</span></a>';
 		
-			echo '</div>';
-			echo $after_widget;
+			$out .= '</div>';
+			$out .= $after_widget;
+			
+			if ( isset($instance['shortcode']) && $instance['shortcode'] )
+				return $out;
+			else
+				echo $out;
 		}
 	}
 
@@ -285,7 +290,8 @@ class SponsorsSlideshowWidget extends WP_Widget
 			'timeout' => 3,
 			'speed' => 3,
 			'post_excerpt_length' => 100,
-			'show_navigation' => 1,
+			'show_navigation_arrows' => 1,
+			'show_pager' => 1,
 			'align' => 'aligncenter',
 			'box' => 'true',
 			'random' => 0
@@ -307,15 +313,16 @@ class SponsorsSlideshowWidget extends WP_Widget
 		);
 		
 		// slideshow parameters
-		$instance = array( 'title' => '', 'source' => htmlspecialchars($source), 'category' => htmlspecialchars($category), 'width' => intval($width), 'height' => intval($height), 'fade' => htmlspecialchars($fade), 'timeout' => intval($timeout), 'speed' => intval($speed), 'order' => intval($random), 'post_excerpt_length' => intval($post_excerpt_length), 'show_navigation' => $show_navigation );
+		$instance = array( 'shortcode' => true, 'title' => '', 'source' => htmlspecialchars($source), 'category' => htmlspecialchars($category), 'width' => intval($width), 'height' => intval($height), 'fade' => htmlspecialchars($fade), 'timeout' => intval($timeout), 'speed' => intval($speed), 'order' => intval($random), 'post_excerpt_length' => intval($post_excerpt_length), 'show_navigation_arrows' => $show_navigation_arrows, 'show_pager' => $show_pager );
 		
 		// add slideshow CSS
-		echo "<style type='text/css'>\n";
-		echo $this->getSlideshowCSS($number, $instance);
-		echo "</style>\n";
+		$out = "<style type='text/css'>\n";
+		$out .= $this->getSlideshowCSS($number, $instance);
+		$out .= "</style>\n";
 		
 		// display slideshow
-		$this->widget($args, $instance);
+		$out .= $this->widget($args, $instance);
+		return $out;
 	}
 	
 	
@@ -627,7 +634,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 				// exclude categories from widget only if source is images
 				if ($option['source'] == 'images') {
 					$cat = explode("_", $option['category']);
-					if (isset($cat[1]))
+					if ( isset($cat[1]) && !in_array($cat[1], $excludes) )
 						$excludes[] = $cat[1];
 				}
 			}

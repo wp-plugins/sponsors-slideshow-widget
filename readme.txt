@@ -3,7 +3,7 @@ Contributors: Kolja Schleich
 Tags: plugin, sidebar, widget, sponsor links, slideshow, featured posts, image slideshow, posts slideshow, shortcode
 Requires at least: 3.3
 Tested up to: 4.3
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 
 Add fancy slideshows to your website in an instance
 
@@ -26,13 +26,16 @@ Include [jQuery](http://malsup.com/jquery/cycle) slideshows on your website in a
 To install the plugin do the following steps
 
 1. Install and activiate the plugin via the admin plugin page.
-2. Install the plugin [Link Manager](https://wordpress.org/plugins/link-manager/) to bring back the pre-WP 3.5 Link System
-3. Go to the widget page and add it to your sidebar.
+2. Go to the widget page and add it to your sidebar.
 
 == Screenshots ==
 1. Slideshow widget settings
 2. Set featured images in posts
 3. Link Management
+4. Media Management
+
+== Credits ==
+The icons were designed by Yusuke Kamiyamane (http://p.yusukekamiyamane.com/)
 
 == HowTo ==
 Include jQuery slideshows on your website in an instance. The plugin offers different sources for generating slideshows including links, images or posts
@@ -55,6 +58,11 @@ Include jQuery slideshows on your website in an instance. The plugin offers diff
 In order to force full-width display of slideshows simply set with to 0px. The same applies to automatic slideshow height.
 
 == ChangeLog ==
+
+= 2.2.2 =
+* UPDATE: updated TinyMCE Button for shortcode
+* UPDATE: Added another screenshot
+* BUGFIX: fixed shortcode output
 
 = 2.2.1 =
 * UPDATE: some styling updates

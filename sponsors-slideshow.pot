@@ -253,3 +253,11 @@ msgstr ""
 #: tinymce/window.php
 msgid "words"
 msgstr ""
+
+#: tinymce/window.php
+msgid "Cancel"
+msgstr ""
+
+#: tinymce/window.php
+msgid "Insert"
+msgstr ""

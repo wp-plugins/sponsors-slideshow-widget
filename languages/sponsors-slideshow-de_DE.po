@@ -266,3 +266,11 @@ msgstr "Rechts gleitend"
 #: tinymce/window.php
 msgid "words"
 msgstr "Wörter"
+
+#: tinymce/window.php
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: tinymce/window.php
+msgid "Insert"
+msgstr "Einfügen"

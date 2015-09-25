@@ -158,6 +158,8 @@ global $wpdb;
 			<td><label for="navigation_arrows"><?php _e('Navigation Arrows', 'sponsors-slideshow') ?></label></td>
 			<td>
 				<input type="checkbox" checked="checked" value="1" name="navigation_arrows" id="navigation_arrows" />
+				<label for="navigation_pager"><?php _e('Pager', 'sponsors-slideshow') ?></label>
+				<input type="checkbox" checked="checked" value="1" name="navigation_pager" id="navigation_pager" />
 				<label for="bounding_box"><?php _e('Bounding Box', 'sponsors-slideshow') ?></label>
 				<input type="checkbox" checked="checked" value="1" name="bounding_box" id="bounding_box" />
 			</td>

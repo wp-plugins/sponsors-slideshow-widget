@@ -215,12 +215,13 @@
 	float: right;
 	margin: 0em 0 1em 1em;
 }
-.slideshow-shortcode.aligncenter:before,
+/*.slideshow-shortcode.aligncenter:before,
 .slideshow-shortcode.aligncenter:after {
 	content: " ";
 	display: table;
 	clear: both;
 }
+*/
 .slideshow-shortcode.bounding-box .fancy-slideshow-container {
 	border: 1px solid;
 }
