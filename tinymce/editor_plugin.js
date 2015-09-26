@@ -18,7 +18,8 @@
 
 			ed.addCommand('mceSponsorsSlideshow', function() {
 				ed.windowManager.open({
-					file : url + '/window.php',
+					//file : url + '/window.php',
+					file: ajaxurl + '?action=sponsors-slideshow_tinymce_window',
 					width : 700, // + ed.getLang('SponsorsSlideshow.delta_width', 0),
 					height : 310, // + ed.getLang('SponsorsSlideshow.delta_height', 0),
 					inline : 1

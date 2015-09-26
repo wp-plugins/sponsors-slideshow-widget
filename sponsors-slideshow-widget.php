@@ -3,7 +3,7 @@
 Plugin Name: Sponsors Slideshow Widget
 Plugin URI: http://www.wordpress.org/extend/plugins/sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 2.2.3
+Version: 2.2.4
 Author: Kolja Schleich
 
 Copyright 2007-2015  Kolja Schleich  (email : kolja [dot] schleich [at] googlemail.com)
@@ -30,7 +30,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '2.2.3';
+	var $version = '2.2.4';
 	
 	/**
 	 * url to the plugin
@@ -56,15 +56,13 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 */
 	function __construct()
 	{
-		// define constants
-		if ( !defined( 'WP_CONTENT_URL' ) )
-			define( 'WP_CONTENT_URL', get_option( 'siteurl' ) . '/wp-content' );
-		if ( !defined( 'WP_PLUGIN_URL' ) )
-			define( 'WP_PLUGIN_URL', WP_CONTENT_URL. '/plugins' );
-			
 		// define plugin url and path
-		$this->plugin_url = esc_url(WP_PLUGIN_URL.'/'.basename(__FILE__, '.php'));
+		$this->plugin_url = esc_url(plugin_dir_url(__FILE__));
 		$this->plugin_path = dirname(__FILE__);
+		
+		// define plugin url and path as constants
+		define ( 'SPONSORS_SLIDESHOW_URL', $this->plugin_url );
+		define ( 'SPONSORS_SLIDESHOW_PATH', $this->plugin_path );
 		
 		// register installation/deinstallation functions
 		register_activation_hook(__FILE__, array(&$this, 'install'));
@@ -100,6 +98,9 @@ class SponsorsSlideshowWidget extends WP_Widget
 		
 		// re-activate links management
 		add_filter( 'pre_option_link_manager_enabled', '__return_true' );
+		
+		// register AJAX action to show TinyMCE Window
+		add_action( 'wp_ajax_sponsors-slideshow_tinymce_window', array(&$this, 'showTinyMCEWindow') );
 		
 		$widget_ops = array('classname' => 'sponsors_slideshow_widget', 'description' => __('Display specific link category as image slide show', 'sponsors-slideshow') );
 		parent::__construct('sponsors-slideshow', __('Slideshow', 'sponsors-slideshow'), $widget_ops);
@@ -580,7 +581,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 */
 	function addStyles()
 	{
-		wp_enqueue_style( 'fancy-slideshow', $this->plugin_url.'/style.css', array(), $this->version, 'all' );
+		wp_enqueue_style( 'fancy-slideshow', $this->plugin_url.'style.css', array(), $this->version, 'all' );
 	}
 	
 	
@@ -595,8 +596,8 @@ class SponsorsSlideshowWidget extends WP_Widget
 		$options = get_option('widget_sponsors-slideshow');
 		unset($options['_multiwidget']);
 		
-		wp_enqueue_style( 'fancy-slideshow', $this->plugin_url.'/style.css', array(), $this->version, 'all' );
-		wp_enqueue_script( 'jquery_slideshow', $this->plugin_url.'/js/jquery.cycle.all.js', array('jquery'), '2.65' );
+		wp_enqueue_style( 'fancy-slideshow', $this->plugin_url.'style.css', array(), $this->version, 'all' );
+		wp_enqueue_script( 'jquery_slideshow', $this->plugin_url.'js/jquery.cycle.all.js', array('jquery'), '2.65' );
 
 		// add inline CSS for each slideshow widget
 		foreach ($options AS $number => $instance)
@@ -760,7 +761,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	}
 	function addTinyMCEPlugin( $plugin_array )
 	{
-		$plugin_array['SponsorsSlideshow'] = $this->plugin_url.'/tinymce/editor_plugin.js';
+		$plugin_array['SponsorsSlideshow'] = $this->plugin_url.'tinymce/editor_plugin.js';
 		return $plugin_array;
 	}
 	function registerTinyMCEButton( $buttons )
@@ -771,6 +772,15 @@ class SponsorsSlideshowWidget extends WP_Widget
 	function changeTinyMCEVersion( $version )
 	{
 		return ++$version;
+	}
+	
+	/**
+	 * Display the TinyMCE Window.
+	 *
+	 */
+	function showTinyMCEWindow() {
+		require_once( $this->plugin_path . '/tinymce/window.php' );
+		exit;
 	}
 }
 // Run SponsorsSlideshowWidget

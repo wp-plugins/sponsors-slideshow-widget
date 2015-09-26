@@ -1,44 +1,23 @@
 <?php
-
-$root = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
-
-if (file_exists($root.'/wp-load.php')) {
-	// WP 2.6
-	require_once($root.'/wp-load.php');
-} else {
-	// Before 2.6
-	if (!file_exists($root.'/wp-config.php'))  {
-		echo "Could not find wp-config.php";	
-		die;	
-	}// stop when wp-config is not there
-	require_once($root.'/wp-config.php');
-}
-
-require_once(ABSPATH.'/wp-admin/admin.php');
-
-load_plugin_textdomain( 'sponsors-slideshow', false, ABSPATH.'/wp-content/plugins/sponsors-slideshow-widget/languages' );
-
 $sources = array( 'links' => __('Links', 'sponsors-slideshow'), 'images' => __('Images', 'sponsors-slideshow'), 'posts' => __('Posts', 'sponsors-slideshow') );
 $terms = array("Links" => "link_category", "Posts" => "category", "Images" => "gallery");
 $effects = array( __('Blind X','sponsors-slideshow') => 'blindX', __('Blind Y','sponsors-slideshow') => 'blindY', __('Blind Z','sponsors-slideshow') => 'blindZ', __('Cover','sponsors-slideshow') => 'cover', __('Curtain X','sponsors-slideshow') => 'curtainX', __('Curtain Y','sponsors-slideshow') => 'curtain>', __('Fade','sponsors-slideshow') => 'fade', __('Fade Zoom','sponsors-slideshow') => 'fadeZoom', __('Scroll Up','sponsors-slideshow') => 'scrollUp', __('Scroll Left','sponsors-slideshow') => 'scrollLeft', __('Scroll Right','sponsors-slideshow') => 'scrollRight', __('Scroll Down','sponsors-slideshow') => 'scrollDown', __('Scroll Horizontal', 'sponsors-slideshow') => 'scrollHorz', __('Scroll Vertical', 'sponsors-slideshow') => 'scrotllVert', __('Shuffle','sponsors-slideshow') => 'shuffle', __('Slide X','sponsors-slideshow') => 'slideX', __('Slide Y','sponsors-slideshow') => 'slideY', __('Toss','sponsors-slideshow') => 'toss', __('Turn Up','sponsors-slideshow') => 'turnUp', __('Turn Down','sponsors-slideshow') => 'turnDown', __('Turn Left','sponsors-slideshow') => 'turnLeft', __('Turn Right','sponsors-slideshow') => 'turnRight', __('Uncover','sponsors-slideshow') => 'uncover', __('Wipe','sponsors-slideshow') => 'wipe', __( 'Zoom','sponsors-slideshow') => 'zoom', __('Grow X','sponsors-slideshow') => 'growX', __('Grow Y','sponsors-slideshow') => 'growY', __('Random','sponsors-slideshow') => 'all');
 $order = array(__('Ordered','sponsors-slideshow') => '0', __('Random','sponsors-slideshow') => '1');
 
-
 // check for rights
 if(!current_user_can('edit_posts')) die;
 
 global $wpdb;
-
 ?>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title><?php _e('Slideshow', 'sponsors-slideshow') ?></title>
 	<meta http-equiv="Content-Type" content="<?php bloginfo('html_type'); ?>; charset=<?php echo get_option('blog_charset'); ?>" />
-	<script language="javascript" type="text/javascript" src="<?php echo get_option('siteurl') ?>/wp-includes/js/tinymce/tiny_mce_popup.js"></script>
-	<script language="javascript" type="text/javascript" src="<?php echo get_option('siteurl') ?>/wp-includes/js/tinymce/utils/mctabs.js"></script>
-	<script language="javascript" type="text/javascript" src="<?php echo get_option('siteurl') ?>/wp-includes/js/tinymce/utils/form_utils.js"></script>
-	<script language="javascript" type="text/javascript" src="<?php echo get_option('siteurl') ?>/wp-content/plugins/sponsors-slideshow-widget/tinymce/tinymce.js"></script>
+	<script language="javascript" type="text/javascript" src="<?php echo includes_url(); ?>js/tinymce/tiny_mce_popup.js"></script>
+	<script language="javascript" type="text/javascript" src="<?php echo includes_url(); ?>js/tinymce/utils/mctabs.js"></script>
+	<script language="javascript" type="text/javascript" src="<?php echo includes_url(); ?>js/tinymce/utils/form_utils.js"></script>
+	<script language="javascript" type="text/javascript" src="<?php echo SPONSORS_SLIDESHOW_URL; ?>tinymce/tinymce.js"></script>
 	<base target="_self" />
 	
 </head>
