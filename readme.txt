@@ -3,7 +3,7 @@ Contributors: Kolja Schleich
 Tags: plugin, sidebar, widget, sponsor links, slideshow, featured posts, image slideshow, posts slideshow, shortcode
 Requires at least: 3.3
 Tested up to: 4.3
-Stable tag: 2.2.4
+Stable tag: 2.2.5
 
 Add fancy slideshows to your website in an instance
 
@@ -59,6 +59,9 @@ Include jQuery slideshows on your website in an instance. The plugin offers diff
 In order to force full-width display of slideshows simply set with to 0px. The same applies to automatic slideshow height.
 
 == ChangeLog ==
+
+= 2.2.5 =
+* UPDATE: changed some styling of prev/next arrows
 
 = 2.2.4 =
 * BUGFIX: fixed some poor file location calling

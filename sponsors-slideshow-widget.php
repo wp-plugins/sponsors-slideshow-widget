@@ -3,7 +3,7 @@
 Plugin Name: Sponsors Slideshow Widget
 Plugin URI: http://www.wordpress.org/extend/plugins/sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 2.2.4
+Version: 2.2.5
 Author: Kolja Schleich
 
 Copyright 2007-2015  Kolja Schleich  (email : kolja [dot] schleich [at] googlemail.com)
@@ -30,7 +30,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '2.2.4';
+	var $version = '2.2.5';
 	
 	/**
 	 * url to the plugin
@@ -89,7 +89,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 		
 		// filter links and categories
 		add_filter( 'widget_links_args', array($this, 'widget_links_args') );
-		add_filter("widget_categories_args", array(&$this, "widget_categories_arg"));
+		add_filter( "widget_categories_args", array(&$this, "widget_categories_arg") );
 		
 		// add shortcode and TinyMCE Button
 		add_shortcode( 'slideshow', array(&$this, 'shortcode') );
@@ -231,13 +231,11 @@ class SponsorsSlideshowWidget extends WP_Widget
 			
 			if ( !empty($instance['title']) )
 				$out .= $before_title . stripslashes($instance['title']) . $after_title;
-			/*elseif ( $instance['title'] == 'N/A' )
-				echo "<br style='clear: both;' />"; // Fix for IE*/
 				
 			$out .= '<div id="fancy-slideshow-'.$number.'-container" class="fancy-slideshow-container">';
 			
 			if (isset($instance['show_navigation_arrows']) && $instance['show_navigation_arrows'] == 1)
-			$out .= '<a href="#" class="prev" id="fancy-slideshow-'.$number.'-prev"><span>&laquo;</span></a>';
+			$out .= '<a href="#" class="prev" id="fancy-slideshow-'.$number.'-prev"><span><</span></a>';
 			
 			$out .= '<div id="fancy-slideshow-'.$number.'" class="fancy-slideshow">';
 			
@@ -310,7 +308,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 			}
 			
 			if (isset($instance['show_navigation_arrows']) && $instance['show_navigation_arrows'] == 1)
-			$out .= '<a href="#" class="next" id="fancy-slideshow-'.$number.'-next"><span>&raquo</span></a>';
+			$out .= '<a href="#" class="next" id="fancy-slideshow-'.$number.'-next"><span>></span></a>';
 		
 			$out .= '</div>';
 			$out .= $after_widget;
@@ -618,7 +616,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 		if (intval($instance['height']) > 0 || intval($instance['width']) > 0) {
 			$css .= "#fancy-slideshow-".$number."-container, #fancy-slideshow-".$number."-container img { ";
 			if (intval($instance['height']) > 0) {
-				//$css .= "height: ".intval($instance['height'])."px;";
+				$css .= "height: ".intval($instance['height'])."px;";
 				$css .= "max-height: ".intval($instance['height'])."px;";
 			}
 			if (intval($instance['width']) > 0) {
@@ -633,7 +631,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 				//$css .= "height: ".intval($instance['height'])/3 . "px !important;";
 				$css .= "max-height: ".intval($instance['height'])/3 ."px !important; }\n";
 				$css .= "#fancy-slideshow-".$number." .fancy-slideshow-container .next, #fancy-slideshow-".$number." .fancy-slideshow-container .prev {";
-				$css .= "top: ".intval($instance['height']-30)/2 ."px;";
+				$css .= "top: ".intval($instance['height']-20)/2 ."px;";
 				$css .= "}";
 			}
 		}

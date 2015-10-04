@@ -57,22 +57,30 @@
  * Next and Previous Arrows
  */
 .fancy-slideshow-container .next, .fancy-slideshow-container .prev {
-	background-color: #f1f1f1;
+	/*background-color: #f1f1f1;
 	background: rgb(241, 241, 241);
 	background: rgba(241, 241, 241, 0.5);
-	color: #000000;
+	color: #000000;*/
+	background-color: #5280b2;
+	background: rgb(0, 0, 0);
+	background: rgba(0, 0, 0, 0.5);
+	color: #fff;
+	width: 1.5em;
+	height: 3em;
 	position: absolute;
 	z-index: 10;
-	top: 45%;
+	top: 40%;
 	display: block;
 	text-align: center;
 	vertical-align: bottom;
-	font-size: 30px; /* define font-size in px to adjust navigation position */
+	font-size: 20px; /* define font-size in px to adjust navigation position */
+	line-height: 2em;
+	padding-top: 0.5em;
 }
 .fancy-slideshow-container .next {
-	right: 0.2em;
+	right: 0;
 	display: block;
-	width: 50px;
+	/*width: 50px;
 	height: 50px;
 	border-radius: 50px;
 	-moz-border-radius: 50px;
@@ -80,7 +88,7 @@
 	
 	background-image: url("arrow_right.png");
 	background-repeat: no-repeat;
-	background-position: center;
+	background-position: center;*/
 /*	border-top: 20px solid transparent;
 	border-bottom: 20px solid transparent;
 	
@@ -89,8 +97,8 @@
 }
 
 .fancy-slideshow-container .prev {
-	left: 0.2em;
-	width: 50px;
+	left: 0;
+	/*width: 50px;
 	height: 50px;
 	border-radius: 50px;
 	-moz-border-radius: 50px;
@@ -98,7 +106,7 @@
 	
 	background-image: url("arrow_left.png");
 	background-repeat: no-repeat;
-	background-position: center;
+	background-position: center;*/
 	/*
 	border-top: 20px solid transparent;
 	border-bottom: 20px solid transparent;
@@ -108,12 +116,17 @@
 }
 
 .fancy-slideshow-container .prev span, .fancy-slideshow-container .next span {
-	display: none;
+	/*display: none;*/
+	position: relative;
+	font-weight: bold;
 }
 
 .fancy-slideshow-container .prev:hover,
 .fancy-slideshow-container .next:hover {
-	background-color: #919191;
+	/*background-color: #919191;*/
+	background-color: #5280b2;
+	background: rgb(0, 0, 0);
+	background: rgba(0, 0, 0, 0.5);
 }
 
 /*
@@ -142,16 +155,16 @@
 .fancy-slideshow-nav a {
 	margin: 0 5px;
 	background-color: #dedede;
-	width: 30px;
-	height: 30px;
+	width: 1.5em;
+	height: 1.5em;
 	float: left;
 	display: block;
-	border-radius: 30px;
-	-moz-border-radius: 30px;
-	-webkit-border-radius: 30px;
-	box-shadow: 0 0 30px #000000;
-	-moz-box-shadow: 0 0 30px #000000;
-	-webkit-box-shadow: 0 0 30px #000000;
+	border-radius: 1.5em;
+	-moz-border-radius: 1.5em;
+	-webkit-border-radius: 1.5em;
+	box-shadow: 0 0 1.5em #000000;
+	-moz-box-shadow: 0 0 1.5em #000000;
+	-webkit-box-shadow: 0 0 1.5em #000000;
 	vertical-align: middle;
 	text-indent: -9999px;
 	border: 0;
