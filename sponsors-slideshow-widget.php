@@ -3,7 +3,7 @@
 Plugin Name: Sponsors Slideshow Widget
 Plugin URI: http://www.wordpress.org/extend/plugins/sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 2.2.5
+Version: 2.2.6
 Author: Kolja Schleich
 
 Copyright 2007-2015  Kolja Schleich  (email : kolja [dot] schleich [at] googlemail.com)
@@ -30,7 +30,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '2.2.5';
+	var $version = '2.2.6';
 	
 	/**
 	 * url to the plugin
@@ -235,7 +235,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 			$out .= '<div id="fancy-slideshow-'.$number.'-container" class="fancy-slideshow-container">';
 			
 			if (isset($instance['show_navigation_arrows']) && $instance['show_navigation_arrows'] == 1)
-			$out .= '<a href="#" class="prev" id="fancy-slideshow-'.$number.'-prev"><span><</span></a>';
+			$out .= '<a href="#" class="prev" id="fancy-slideshow-'.$number.'-prev"><span>&lt;</span></a>';
 			
 			$out .= '<div id="fancy-slideshow-'.$number.'" class="fancy-slideshow">';
 			
@@ -248,6 +248,9 @@ class SponsorsSlideshowWidget extends WP_Widget
 					$item->image = $item->link_image;
 					$item->url = $item->link_url;
 					$item->url_target = $item->link_target;
+					$item->link_class = '';
+					$item->link_rel = 'nofollow';
+					$item->title = $item->name;
 				}
 				if ( $instance['source'] == 'posts' ) {
 					$thumb_size = array(intval($instance['height']), intval($instance['width']));
@@ -265,17 +268,29 @@ class SponsorsSlideshowWidget extends WP_Widget
 					$item->image = wp_get_attachment_url( get_post_thumbnail_id($item->ID, $thumb_size) );
 					$item->url = get_permalink($item->ID);
 					$item->url_target = '';
+					$item->link_class = '';
+					$item->link_rel = '';
+					$item->title = $item->name;
 				}
 				if ( $instance['source'] == 'images' ) {
 					$item->name = $item->post_title;
 					$item->image = $item->guid;
-					$item->url = '';
+					$item->url = $item->guid;
 					$item->url_target = '';
+					$item->link_class = 'thickbox';
+					//$item->link_rel = sprintf("slideshow-%d", $number);
+					$item->link_rel = '';
+					
+					if ( $item->post_content != "" )
+						$item->title = stripslashes(htmlspecialchars($item->post_content));
+					elseif ( $item->post_excerpt != "" )
+						$item->title = stripslashes(htmlspecialchars($item->post_excerpt));
+					else
+						$item->title = $item->name;
 				}
 
-				
 				if ( $item->image != "" )
-					$text = sprintf('<img src="%s" alt="%s" />', esc_url($item->image), $item->name);
+					$text = sprintf('<img src="%s" alt="%s" title="%s" />', esc_url($item->image), $item->name, $item->title);
 				else
 					$text = $item->name;
 				
@@ -283,7 +298,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 				
 				if ( $item->url != '' ) {
 					$target = ($item->url_target != "") ? 'target="'.$item->url_target.'"' : '';
-					$out .= sprintf('<a href="%s" %s title="%s">%s</a>', esc_url($item->url), $target, $item->name, $text);
+					$out .= sprintf('<a class="%s" href="%s" %s title="%s" rel="%s">%s</a>', $item->link_class, esc_url($item->url), $target, $item->title, $item->link_rel, $text);
 				} else {
 					$out .= $text;
 				}
@@ -308,7 +323,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 			}
 			
 			if (isset($instance['show_navigation_arrows']) && $instance['show_navigation_arrows'] == 1)
-			$out .= '<a href="#" class="next" id="fancy-slideshow-'.$number.'-next"><span>></span></a>';
+			$out .= '<a href="#" class="next" id="fancy-slideshow-'.$number.'-next"><span>&gt;</span></a>';
 		
 			$out .= '</div>';
 			$out .= $after_widget;

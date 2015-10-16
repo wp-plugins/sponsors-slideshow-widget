@@ -2,8 +2,8 @@
 Contributors: Kolja Schleich
 Tags: plugin, sidebar, widget, sponsor links, slideshow, featured posts, image slideshow, posts slideshow, shortcode
 Requires at least: 3.3
-Tested up to: 4.3
-Stable tag: 2.2.5
+Tested up to: 4.3.1
+Stable tag: 2.2.6
 
 Add fancy slideshows to your website in an instance
 
@@ -59,6 +59,12 @@ Include jQuery slideshows on your website in an instance. The plugin offers diff
 In order to force full-width display of slideshows simply set with to 0px. The same applies to automatic slideshow height.
 
 == ChangeLog ==
+
+= 2.2.6 =
+* NEW: add links to images in slideshows using Images as source
+* NEW: add "thickbox" class to links slideshows using Images as source to enable fancy image popups
+* NEW: add image description, caption or name (in this order) as link title for slideshows using Images as source. To show in the thickbox popup
+* NEW: add rel="nofollow" to links using Links as source
 
 = 2.2.5 =
 * UPDATE: changed some styling of prev/next arrows
