@@ -3,10 +3,10 @@
 Plugin Name: Sponsors Slideshow Widget
 Plugin URI: http://www.wordpress.org/extend/plugins/sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 2.2.6
+Version: 2.2.7
 Author: Kolja Schleich
 
-Copyright 2007-2015  Kolja Schleich  (email : kolja [dot] schleich [at] googlemail.com)
+Copyright 2007-2015  Kolja Schleich  (email : kolja [dot] schleich [at] googlemail [dot] com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '2.2.6';
+	var $version = '2.2.7';
 	
 	/**
 	 * url to the plugin
@@ -316,10 +316,10 @@ class SponsorsSlideshowWidget extends WP_Widget
 			
 			// Slideshow Button Navigation
 			if (isset($instance['show_pager']) && $instance['show_pager'] == 1) {
-				// Each link is 30px in width with 5px margin left and right
-				$max_width = 40 * count($results);
+				// Each link is 1.5em in width with 0.3571em margin left and right
+				$max_width = 2.2143 * count($results);
 				$class = ( $instance['source'] == 'posts' ) ? 'posts' : '';
-				$out .= '<div class="fancy-slideshow-nav-container '.$class.'"><nav id="fancy-slideshow-nav-'.$number.'" class="fancy-slideshow-nav" style="max-width: '.$max_width.'px"></nav></div>';
+				$out .= '<div class="fancy-slideshow-nav-container '.$class.'"><nav id="fancy-slideshow-nav-'.$number.'" class="fancy-slideshow-nav" style="max-width: '.$max_width.'em"></nav></div>';
 			}
 			
 			if (isset($instance['show_navigation_arrows']) && $instance['show_navigation_arrows'] == 1)
@@ -806,19 +806,23 @@ add_action('widgets_init', 'sponsors_slideshow_widget_init');
 /**
  * Wrapper function to display Sponsors Slideshow Widget statically
  *
- * @param array $args basic arguments including before_widget, after_widget, before_title, after_title and number
+ * @param array $args basic arguments including before_widget, after_widget, before_title, after_title and number (unique widget number)
  * @param array $instance settings for this instance. See list below for parameters
  *
  * This function can be used to display Sponsors Slideshow Widget in a Non-widgetized Theme.
  * Below is a list of needed arguments passed as an associative Array in $instance
  *
- * - category: ID of Link category to display
- * - widget_title: Widget title, if left empty no title will be displayed
+ * - source: slideshow source, "links", "posts", "images"
+ * - category: term and category, e.g. link_category_ID, category_ID, latest_N, where ID or N are the category ID or number of latest posts
+ * - title: Widget title, if left empty no title will be displayed
  * - fade: Fade effect, see http://malsup.com/jquery/cycle/begin.html for a list of available effects
- * - time: Time in seconds between images
+ * - timeout: Time in seconds between images
+ * - speed: slideshow speed in seconds
  * - width: width in px of the Slideshow
  * - height: height in px  of the Slideshow
  * - order: 0 for sequential, 1 for random ordering of links
+ * - show_navigation_arrows: 0 or 1 to control display of navigation arrows
+ * - show_pager: 0 or 1 to control display of pager navigation
  */
 function sponsors_slideshow_widget_display( $args = array(), $instance = array() ) {
 	$sponsors_slideshow_widget = new SponsorsSlideshowWidget();
