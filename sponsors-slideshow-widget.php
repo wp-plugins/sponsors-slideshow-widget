@@ -3,7 +3,7 @@
 Plugin Name: Sponsors Slideshow Widget
 Plugin URI: http://www.wordpress.org/extend/plugins/sponsors-slideshow-widget
 Description: Display certain link category as slideshow in sidebar
-Version: 2.2.7
+Version: 2.2.8
 Author: Kolja Schleich
 
 Copyright 2007-2015  Kolja Schleich  (email : kolja [dot] schleich [at] googlemail [dot] com)
@@ -30,7 +30,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '2.2.7';
+	var $version = '2.2.8';
 	
 	/**
 	 * url to the plugin
@@ -237,7 +237,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 			if (isset($instance['show_navigation_arrows']) && $instance['show_navigation_arrows'] == 1)
 			$out .= '<a href="#" class="prev" id="fancy-slideshow-'.$number.'-prev"><span>&lt;</span></a>';
 			
-			$out .= '<div id="fancy-slideshow-'.$number.'" class="fancy-slideshow">';
+			$out .= '<div id="fancy-slideshow-'.$number.'" class="fancy-slideshow slides">';
 			
 			$i = 0;
 			foreach ( $results AS $item ) {
@@ -294,7 +294,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 				else
 					$text = $item->name;
 				
-				$out .= '<div id="slideshow-'.$number.'-item-'.$i.'" class="slideshow-content">';
+				$out .= '<div id="slideshow-'.$number.'-slide-'.$i.'" class="slide">';
 				
 				if ( $item->url != '' ) {
 					$target = ($item->url_target != "") ? 'target="'.$item->url_target.'"' : '';
@@ -645,9 +645,9 @@ class SponsorsSlideshowWidget extends WP_Widget
 				$css .= "\n#fancy-slideshow-".$number."-container .featured-post {";
 				//$css .= "height: ".intval($instance['height'])/3 . "px !important;";
 				$css .= "max-height: ".intval($instance['height'])/3 ."px !important; }\n";
-				$css .= "#fancy-slideshow-".$number." .fancy-slideshow-container .next, #fancy-slideshow-".$number." .fancy-slideshow-container .prev {";
-				$css .= "top: ".intval($instance['height']-20)/2 ."px;";
-				$css .= "}";
+				//$css .= "#fancy-slideshow-".$number." .fancy-slideshow-container .next, #fancy-slideshow-".$number." .fancy-slideshow-container .prev {";
+				//$css .= "top: ".intval($instance['height']-20)/2 ."px;";
+				//$css .= "}";
 			}
 		}
 		return $css;
