@@ -21,7 +21,7 @@
 					//file : url + '/window.php',
 					file: ajaxurl + '?action=sponsors-slideshow_tinymce_window',
 					width : 700, // + ed.getLang('SponsorsSlideshow.delta_width', 0),
-					height : 310, // + ed.getLang('SponsorsSlideshow.delta_height', 0),
+					height : 430, // + ed.getLang('SponsorsSlideshow.delta_height', 0),
 					inline : 1
 				}, {
 					plugin_url : url // Plugin absolute URL

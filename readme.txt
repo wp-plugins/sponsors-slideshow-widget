@@ -1,24 +1,25 @@
-=== Sponsors Slideshow Widget ===
+=== Fancy Slideshows ===
 Contributors: Kolja Schleich
 Tags: plugin, sidebar, widget, sponsor links, slideshow, featured posts, image slideshow, posts slideshow, shortcode
 Requires at least: 3.3
 Tested up to: 4.3.1
-Stable tag: 2.2.8
+Stable tag: 2.3.1
 
 Add fancy slideshows to your website in an instance
 
 == Description ==
 
-Include [jQuery](http://malsup.com/jquery/cycle) slideshows on your website in an instance
+Include beautiful slideshows on your website in an instance
 
-* Featured Posts and Images
-* Multiple sources for slideshows including links, images or posts
+* Multiple slide sources, including images, posts, pages and links
+* Include slideshows as multi-widgets or in any page or post using shortcode (including TinyMCE Button)
+* Different transition effects, including carousel slideshows
+* Animated overlays to show off your content
+* Include arrow and button or thumbnail navigations
 * Re-activate WordPress Link Management System
-* Enable featured images for posts (post-thumbnail)
-* Multiple widgets and shortcode
-* Enable custom gallery taxonomy for images
-* Easy customization slideshows 
-* Include manual navigation
+* Featured images for posts (post-thumbnail)
+* Easy customization of slideshows
+* Addition of slide sources through wordpress filter
 * Exclude the chosen slideshow links category from the Wordpress internal links widget
 
 == Installation ==
@@ -34,31 +35,105 @@ To install the plugin do the following steps
 3. Link Management
 4. Media Management
 5. Featured Posts Slideshow
+6. TinyMCE Button
 
 == Credits ==
+The plugin uses the [jQuery Cycle2 Plugin](http://jquery.malsup.com/cycle2/)
 The icons were designed by Yusuke Kamiyamane (http://p.yusukekamiyamane.com/)
 
 == HowTo ==
-Include jQuery slideshows on your website in an instance. The plugin offers different sources for generating slideshows including links, images or posts
+Include fancy slideshows on your website in an instance. The plugin offers different sources for generating slideshows including links, images or posts
 
 = Links =
 1. Create at least one category and add links including Image Address
-2. Choose Links as source and corresponding links category in the widget settings page
+2. Choose corresponding links category as source
 
 = Images =
-1. The plugin enables categorization of media
-2. Upload images and add the desired images to a category
-3. Choose Images as source and corresponding images/posts category in the widget settings page
+1. The plugin enables media galleries
+2. Upload images and add the desired images to a gallery
+3. Choose corresponding image gallery as source
 
-= Posts =
-1. Add featured images to posts
-2. Choose Posts as source and corresponding images/posts category in the widget settings page
-3. In addition to the featured image, post title and an excerpt are displayed above linking to the post
+= Posts/Pages =
+1. Add featured images to posts or pages
+2. Choose corresponding posts or pages category as source
+3. In addition to the featured image, post title (slide title) and an excerpt (slide description) are displayed above linking to the post. This can be also customized through a post meta box
+
+= Additional Slide Sources =
+Probably a unique feature of the plugin is the possibility of adding additional external slide sources. It allows easy generation of slideshows from virtually any source and involves two wordpress filters.
+
+The first step is to add slide sources to the selection menu
+
+	add_filter( "fancy_slideshow_sources", "my_slideshow_sources" );
+
+	function my_slideshow_sources( $sources ) {
+		$sources['mysource'] = array(
+			"title" => "Source Title",
+			"options" => array(
+				array( "value" => "mysource_ID", "label" => "Option 1" ),
+				...
+			)	
+		);
+		
+		return $sources;
+	}
+
+This function has to add a multi-dimensional array to the already existing sources. The $sources['mysource']['options'] array will be converted to an optgroup with label $sources['mysource']['title']. The structure of the value field has to have the structure indicated, i.e. *mysource_ID*. It can be also extended at the end with further fields separated by _ which will be used to break the value into different fields.
+
+The second step is to add a function that retrieves the data and sets up the slides data.
+
+	add_filter( "fancy_slideshow_get_slides_<*mysource*>", "get_my_slides" );
+
+You see that the filter has the *mysource* part included, which has to match the primary array key in the function my_slideshow_sources.
+
+	function get_my_slides( $source ) {
+		
+		$source_ID = $source[1];
+		
+		// Do some stuff to get slides data
+		...
+		
+		$slides = array();
+		foreach ( $results AS $result ) {
+			$slide = array(
+				"name" => $result->name,
+				"image" => $result->image_url,
+				"url" => $result->url,
+				"url_target" => '',
+				"link_class" => 'thickbox',
+				"link_rel" => '',
+				"title" => $result->name,
+				"slide_title" => $result->name,
+				"slide_desc" => ""
+			);
+				
+			$slides[] = (object)$slide;
+		}
+			
+		return $slides;
+	}
+
+The above function gives a representative example of how the return array for each slide has to look like.
 
 = Full width display =
-In order to force full-width display of slideshows simply set with to 0px. The same applies to automatic slideshow height.
+In order to force full-width display of slideshows simply set width to 0px. The same applies to automatic slideshow height.
 
 == ChangeLog ==
+
+= 2.3.1 =
+* BUGFIX: fixed some style issues
+
+= 2.3 =
+* CHANGE: renamed plugin to Fancy Slideshows to better reflect its functionality
+* NEW: changed cycle plugin to [jQuery Cycle2 Plugin](http://jquery.malsup.com/cycle2/)
+* NEW: carousel fade effect
+* NEW: Included jQuery easing transitions
+* NEW: fancy animated slide overlays with different css styles
+* NEW: Thumbnail navigation
+* NEW: fade-in navigation arrows on slideshow mouse hover. Fade out if mouse leaves slideshow
+* NEW: hide navigation pager by default and show using jQuery
+* NEW: added hyperlink to post excerpt container
+* NEW: wordpress filters to dynamically add slide sources from other plugins (no external images and hyperlinks for security reasons)
+* BUGFIX: fixed styling issue when navigation pager is used in combination with post source
 
 = 2.2.8 =
 * UPDATE: some more small style updates

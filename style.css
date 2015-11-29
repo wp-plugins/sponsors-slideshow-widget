@@ -3,8 +3,9 @@
  */ 
 .fancy-slideshow-container {
 	position: relative;
-	width: 100%;
-	height: auto;
+	/*width: 100%;*/
+	max-width: 100%;
+	height: 100%;
 	margin: 0 auto;
 	padding: 0;
 	text-align: center;
@@ -26,10 +27,13 @@
 	margin: 0 auto;
 	padding: 0;
 	z-index: 1;
-	overflow: hidden;
+	font-size: 1em;
+	/*overflow: hidden;*/
 }
 .fancy-slideshow.slides {
 	list-style: none;
+	margin: 0 !important;
+	padding: 0 !important;
 }
 .fancy-slideshow.slides li {
 	margin: 0;
@@ -42,7 +46,6 @@
 	border: 0;
 }
 .fancy-slideshow img {
-	border: none;
 	display: block;
 	margin: 0 auto;
 	padding: 0;
@@ -50,11 +53,12 @@
 	width: 100%;
 	height: auto;
 }
-.fancy-slideshow div {
-	position: relative;
+.fancy-slideshow .slide {
+	/*position: relative;*/
 	z-index: 1;
 	width: 100%;
 }
+
 
 
 /*
@@ -68,10 +72,29 @@
 	position: absolute;
 	z-index: 10;
 	top: 50%;
-	display: block;
 	text-align: center;
 	vertical-align: middle;
+	display: none;
+	height: 3em;
+	margin-top: -1.5em;
+	font-size: 100%;
+	/*-webkit-opacity: 0;
+	-moz-opacity: 0;
+	opacity: 0;
+	-webkit-transition: opacity 1s ease-in;
+    -moz-transition: opacity 1s ease-in;
+    -o-transition: opacity 1s ease-in;
+    -ms-transition: opacity 1s ease-in;
+    transition: opacity 1s ease-in;*/
 }
+.fancy-slideshow-container:hover .next,
+.fancy-slideshow-container:hover .prev {
+	/*display: block;
+	-webkit-opacity: 1;
+	-moz-opacity: 1;
+	opacity: 1;*/
+}
+
 .fancy-slideshow-container .next {
 	right: 0;
 }
@@ -86,8 +109,9 @@
 	font-weight: bold;
 	font-size: 1.5em; /* used to define font-size in px to adjust navigation position */
 	line-height: 1em;
-	padding: 0.75em 0;
+	margin-top: 0.5em;
 	width: 1.5em;
+	vertical-align: middle;
 }
 
 .fancy-slideshow-container .prev:hover,
@@ -102,27 +126,31 @@
  */
 .fancy-slideshow-nav-container {
 	z-index: 9;
-	margin: 0 auto;
+	margin: 0.5em auto;
 	padding: 0 auto;
 	text-align: center;
 	display: block;
-	position: absolute;
-	bottom: 1em;
+/*	position: absolute;
+	bottom: 1em;*/
 	width: 100%;
+	font-size: 1em;
 }
 .fancy-slideshow-nav-container.posts {
-	position: absolute;
+	/*position: absolute;
 	top: 1.5em;
+	bottom: auto;*/
 }
 .fancy-slideshow-nav {
 	text-align: center;
 	margin: 0 auto;
-	padding: 0 auto;
-	display: block;
+	padding: 0;
+	display: none;
+	min-height: 1em;
 }
-.fancy-slideshow-nav a {
+.fancy-slideshow-nav.buttons a {
 	margin: 0 0.3571em; /* scaled to 5px @ 14px base size */
-	background-color: #dedede;
+	background-color: #999;
+	font-size: 1em;
 	width: 1em;
 	height: 1em;
 	float: left;
@@ -138,15 +166,128 @@
 	border: 0;
 	text-decoration: none;
 }
-.fancy-slideshow-nav a:hover,
-.fancy-slideshow-nav a.active,
-.fancy-slideshow-nav a.activeSlide {
-	background-color: #555555;
+.fancy-slideshow-nav.thumbs {
+}
+.fancy-slideshow-nav.thumbs a {
+	border: 0;
+}
+.fancy-slideshow-nav.thumbs img {
+	opacity: 0.5;
+}
+.fancy-slideshow-nav.thumbs a.first-slide img {
+	margin-left: 0 !important;
+}
+.fancy-slideshow-nav.thumbs a.last-slide img {
+	margin-right: 0 !important;
+}
+.fancy-slideshow-nav.thumbs a.activeSlide img,
+.fancy-slideshow-nav.thumbs a.cycle-pager-active img,
+.fancy-slideshow-nav.thumbs a:hover img {
+	opacity: 1;
+}
+.fancy-slideshow-nav.buttons a:hover,
+.fancy-slideshow-nav.buttons a.active,
+.fancy-slideshow-nav.buttons a.activeSlide,
+.fancy-slideshow-nav.buttons a.cycle-pager-active {
+	background-color: #000;
 }
 
+/*
+ * Slideshow Overlay
+ */
+.fancy-slideshow .cycle-overlay.default {
+	position: absolute;
+	bottom: 0;
+	margin: 0;
+	font-size: 1em;
+	padding: 0.3em;
+	color: #fff;
+	background: rgb(0, 0, 0);
+	background: rgba(0, 0, 0, 0.5);
+	/* For IE 5.5 - 7*/
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#000000, endColorstr=#000000);
+	/* For IE 8*/
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#000000, endColorstr=#000000)";
+	z-index: 101;
+	width: 100%;
+}
+.fancy-slideshow .cycle-overlay.default .title {
+	font-weight: bold;
+	display: block;
+}
+.fancy-slideshow .cycle-overlay.default .description {
+	display: block;
+}
+.fancy-slideshow .cycle-overlay.default .continue {
+	display: inline-block;
+	margin-left: 0.5em;
+}
+.fancy-slideshow .cycle-overlay.default .continue a {
+	color: #fff;
+	border-bottom: 1px dotted #fff;
+}
+
+/* --- Posts/Pages-specific overlay --- */
+.fancy-slideshow.posts .cycle-overlay.default,
+.fancy-slideshow.pages .cycle-overlay.default {
+	text-align: left;
+	height: 33.33333%;
+	max-height: 150px;
+}
+.fancy-slideshow.posts .cycle-overlay.default .title,
+.fancy-slideshow.pages .cycle-overlay.default .title {
+	margin-bottom: 0.5em;
+}
+
+.fancy-slideshow .cycle-overlay.fancy {
+	position: absolute;
+	top: 20%;
+	left: 0;
+	right: 0;
+	color: #fff;
+	z-index: 101;
+	width: 60%;
+	margin: 0 auto;
+	font-size: 1em;
+	text-align: center;
+}
+.fancy-slideshow .cycle-overlay.fancy .title {
+	font-size: 4em;
+	-moz-text-shadow:0 1px 0px #000000;
+	-webkit-text-shadow:0 1px 0px #000000;
+	text-shadow:0 1px 0px #000000;
+}
+.fancy-slideshow .cycle-overlay.fancy .title:after {
+	content: " ";
+	display: table;
+	clear: both;
+}
+.fancy-slideshow .cycle-overlay.fancy .description {
+	font-size: 2em;
+	clear: both;
+	display: block;
+	padding: 0.2em;
+	margin-top: 1em;	
+	background: rgb(0, 0, 0);
+	background: rgba(0, 0, 0, 0.5);
+	/* For IE 5.5 - 7*/
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#000000, endColorstr=#000000);
+	/* For IE 8*/
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#000000, endColorstr=#000000)";
+}
+.fancy-slideshow .cycle-overlay.fancy .continue {
+	clear: both;
+	display: block;
+	margin-top: 1em;
+}
+.fancy-slideshow .cycle-overlay.fancy .continue a {
+	color: #fff;
+	display: inline-block;
+	border-bottom: 1px dotted #fff;
+}
 
 /*
- * Featured Posts Excerpt
+ * Featured Posts Excerpt Layer - DEPRECATED
  */
 .fancy-slideshow .featured-post {
 	position: absolute;
@@ -181,22 +322,45 @@
 	text-align: justify;
 }
 
+/*
+ * Image Caption Layer - DEPRECATED
+ */
+.fancy-slideshow .image-caption {
+	position: absolute;
+	bottom: 0;
+	margin: 0;
+	padding: 0;
+	color: #fff;
+	background: rgb(0, 0, 0);
+	background: rgba(0, 0, 0, 0.5);
+	/* For IE 5.5 - 7*/
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#000000, endColorstr=#000000);
+	/* For IE 8*/
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#000000, endColorstr=#000000)";
+}
+.fancy-slideshow .image-caption p {
+	font-weight: bold;
+	padding: 0;
+	margin: 0.5em;
+}
+
 
 /*
  * Slideshow Shortcode
  */
-.slideshow-shortcode {
+.fancy-slideshow-shortcode {
+	width: 100%;
 	margin: 1em auto;
 }
-.slideshow-shortcode.alignleft {
+.fancy-slideshow-shortcode.alignleft {
 	float: left;
 	margin: 0em 1em 1em 0;
 }
-.slideshow-shortcode.alignright {
+.fancy-slideshow-shortcode.alignright {
 	float: right;
 	margin: 0em 0 1em 1em;
 }
-.slideshow-shortcode.bounding-box .fancy-slideshow-container {
+.fancy-slideshow-shortcode.bounding-box .fancy-slideshow-container {
 	border: 1px solid;
 }
 .
@@ -208,13 +372,17 @@
 	text-align: left;
 	clear: both;
 }
+.fancy-slideshow-control h4 {
+	padding: 0.5em;
+}
 .fancy-slideshow-control label {
 	padding: 0.5em;
 	width: 8em;
 	float: left;
 	vertical-align: middle;
 }
-.fancy-slideshow-control label.checkbox {
+.fancy-slideshow-control label.checkbox,
+ .fancy-slideshow-control label.radio {
 	padding: 0 0.5em;
 	}
 .fancy-slideshow-control label.right {
@@ -222,8 +390,11 @@
 	width: auto;
 	margin-right: 0.5em;
 }
-.fancy-slideshow-control input.left {
-	margin-left: 8em;
+.fancy-slideshow-control ul.radio {
+	list-style: none;
+}
+.fancy-slideshow-control ul.radio li.left {
+	margin-left: 9em;
 }
 .fancy-slideshow-control input {
 	display: inline;
@@ -239,6 +410,24 @@
 	margin: 0;
 }
 
+
+/*
+ * Post Meta Box
+ */
+.fancy-slideshow-post-meta {
+}
+.fancy-slideshow-post-meta label {
+	font-weight: bold;
+}
+.fancy-slideshow-post-meta label:after {
+	content: " ";
+	display: table;
+	clear: both;
+}
+.fancy-slideshow-post-meta input,
+.fancy-slideshow-post-meta textarea {
+	width: 100%;
+}
 
 /*
  * Media Queries

@@ -7,11 +7,14 @@ function getCheckedValue(radioObj) {
 	if(!radioObj)
 		return "";
 	var radioLength = radioObj.length;
-	if(radioLength == undefined)
+	
+	if(radioLength == undefined) {
 		if(radioObj.checked)
 			return radioObj.value;
 		else
 			return "";
+	}
+	
 	for(var i = 0; i < radioLength; i++) {
 		if(radioObj[i].checked) {
 			return radioObj[i].value;
@@ -24,7 +27,7 @@ function SponsorsSlideshowInsertLink() {
 	
 	var tagtext;
 	
-	var source = document.getElementById('source').value;
+	//var source = document.getElementById('source').value;
 	var category = document.getElementById('category').value;
 	var order = document.getElementById('order').value;
 	var width = document.getElementById('width').value;
@@ -32,22 +35,35 @@ function SponsorsSlideshowInsertLink() {
 	var timeout = document.getElementById('timeout').value;
 	var speed = document.getElementById('speed').value;
 	var fade = document.getElementById('fade').value;
+	var easing = document.getElementById('easing').value;
 	var navigation_arrows = getCheckedValue(document.getElementById('navigation_arrows'));
-	var navigation_pager = getCheckedValue(document.getElementById('navigation_pager'));
+	var navigation_pager = getCheckedValue(document.getElementsByName('navigation_pager'));
 	var bounding_box = getCheckedValue(document.getElementById('bounding_box'));
 	var alignment = document.getElementById('alignment').value;
 	var post_excerpt_length = document.getElementById('post_excerpt_length').value;
+	var overlay_display = document.getElementById('overlay_display').value;
+	var overlay_animate = document.getElementById('overlay_animate').value;
+	var overlay_effects = document.getElementById('overlay_effects').value;
+	var overlay_style = document.getElementById('overlay_style').value;
+	var carousel_num_slides = document.getElementById('carousel_num_slides').value;
 	
 	if (bounding_box == 1)
 		bounding_box = 'true';
 	else
 		bounding_box = 'false';
 	
-
-	if (post_excerpt_length != "")
-		post_excerpt_length = ' post_excerpt_length=' + post_excerpt_length;
+	if (easing != "none")
+		easing = " easing='" + easing + "'";
+	else
+		easing = "";
 	
-	tagtext = "[slideshow source=" + source + " category=" + category + " random=" + order + " width=" + width + " height=" + height + " timeout=" + timeout + " speed=" + speed + " fade=" + fade + " show_navigation_arrows=" + navigation_arrows + " show_pager=" + navigation_pager + " box=" + bounding_box + " align=" + alignment + post_excerpt_length + "]";
+	if (fade == "carousel" && carousel_num_slides != "")
+		carousel_num_slides = " carousel_num_slides='" + carousel_num_slides + "'";
+	
+	if (post_excerpt_length != "")
+		post_excerpt_length = " post_excerpt_length='" + post_excerpt_length + "'";
+	
+	tagtext = "[slideshow category='" + category + "' random='" + order + "' width='" + width + "' height='" + height + "' timeout='" + timeout + "' speed='" + speed + "' fade='" + fade + easing + "' show_navigation_arrows='" + navigation_arrows + "' navigation_pager='" + navigation_pager + "' box='" + bounding_box + "' align='" + alignment + "'" + post_excerpt_length + " overlay='" + overlay_display + "' overlay_fx_sel='" + overlay_animate + "' overlay_fade='" + overlay_effects + "' overlay_style='" + overlay_style + "'" + carousel_num_slides + "]";
 
 	if(window.tinyMCE) {
 		/* get the TinyMCE version to account for API diffs */

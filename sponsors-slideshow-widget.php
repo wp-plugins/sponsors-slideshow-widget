@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: Sponsors Slideshow Widget
+Plugin Name: Fancy Slideshows
 Plugin URI: http://www.wordpress.org/extend/plugins/sponsors-slideshow-widget
-Description: Display certain link category as slideshow in sidebar
-Version: 2.2.8
+Description: Generate fancy slideshows in an instance
+Version: 2.3.1
 Author: Kolja Schleich
 
 Copyright 2007-2015  Kolja Schleich  (email : kolja [dot] schleich [at] googlemail [dot] com)
@@ -30,7 +30,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @var string
 	 */
-	var $version = '2.2.8';
+	var $version = '2.3.1';
 	
 	/**
 	 * url to the plugin
@@ -61,8 +61,10 @@ class SponsorsSlideshowWidget extends WP_Widget
 		$this->plugin_path = dirname(__FILE__);
 		
 		// define plugin url and path as constants
-		define ( 'SPONSORS_SLIDESHOW_URL', $this->plugin_url );
-		define ( 'SPONSORS_SLIDESHOW_PATH', $this->plugin_path );
+		if ( !defined( 'SPONSORS_SLIDESHOW_URL' ) )
+			define ( 'SPONSORS_SLIDESHOW_URL', $this->plugin_url );
+		if ( !defined( 'SPONSORS_SLIDESHOW_PATH' ) )
+			define ( 'SPONSORS_SLIDESHOW_PATH', $this->plugin_path );
 		
 		// register installation/deinstallation functions
 		register_activation_hook(__FILE__, array(&$this, 'install'));
@@ -75,11 +77,8 @@ class SponsorsSlideshowWidget extends WP_Widget
 		add_action( 'wp_enqueue_scripts', array(&$this, 'addScripts'), 5 );
 		add_action( 'admin_enqueue_scripts', array(&$this, 'addStyles') );
 		
-		// enable categories for attachments/media
-		//add_action( 'init' , array(&$this, 'addCategoriesToAttachments') );
-		
 		// add new gallery taxonomy
-		add_action( 'init', array(&$this, 'addTaxonomy') );
+		add_action( 'init', array(&$this, 'addTaxonomies') );
 		
 		// filter posts query
 		add_action( 'pre_get_posts', array(&$this, 'exclude_posts') );
@@ -102,7 +101,14 @@ class SponsorsSlideshowWidget extends WP_Widget
 		// register AJAX action to show TinyMCE Window
 		add_action( 'wp_ajax_sponsors-slideshow_tinymce_window', array(&$this, 'showTinyMCEWindow') );
 		
-		$widget_ops = array('classname' => 'sponsors_slideshow_widget', 'description' => __('Display specific link category as image slide show', 'sponsors-slideshow') );
+		// Add custom meta box to posts and pages for optional title and description of slides
+		add_action( 'add_meta_boxes_post', array(&$this, 'addMetaboxPost') );
+		add_action( 'add_meta_boxes_page', array(&$this, 'addMetaboxPage') );
+		// Add actions to modify custom post meta upon publishing and editing post
+		add_action( 'publish_post', array(&$this, 'editPostMeta') );
+		add_action( 'edit_post', array(&$this, 'editPostMeta') );
+		
+		$widget_ops = array('classname' => 'sponsors_slideshow_widget', 'description' => __('Generate fancy slideshows', 'sponsors-slideshow') );
 		parent::__construct('sponsors-slideshow', __('Slideshow', 'sponsors-slideshow'), $widget_ops);
 	}
 	function SponsorsSlideshowWidget()
@@ -116,7 +122,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 *
 	 * @param none
 	 */
-	function addTaxonomy()
+	function addTaxonomies()
 	{
 		$labels = array(
 			'name'              => __('Galleries', 'sponsors-slideshow'),
@@ -141,6 +147,30 @@ class SponsorsSlideshowWidget extends WP_Widget
 		);
 
 		register_taxonomy( 'gallery', 'attachment', $args );
+		
+		$labels = array(
+			'name'              => __('Categories', 'sponsors-slideshow'),
+			'singular_name'     => __('Category', 'sponsors-slideshow'),
+			'search_items'      => __('Search Categories', 'sponsors-slideshow'),
+			'all_items'         => __('All Categories', 'sponsors-slideshow'),
+			'parent_item'       => __('Parent Category', 'sponsors-slideshow'),
+			'parent_item_colon' => __('Parent Category:', 'sponsors-slideshow'),
+			'edit_item'         => __('Edit Category', 'sponsors-slideshow'),
+			'update_item'       => __('Update Category', 'sponsors-slideshow'),
+			'add_new_item'      => __('Add New Category', 'sponsors-slideshow'),
+			'new_item_name'     => __('New Category Name', 'sponsors-slideshow'),
+			'menu_name'         => __('Categories', 'sponsors-slideshow')
+		);
+
+		$args = array(
+			'labels' => $labels,
+			'hierarchical' => true,
+			'query_var' => 'true',
+			'rewrite' => 'true',
+			'show_admin_column' => 'true',
+		);
+
+		register_taxonomy( 'page_category', 'page', $args );
 	}
 	
 	
@@ -168,21 +198,18 @@ class SponsorsSlideshowWidget extends WP_Widget
 		extract( $args, EXTR_SKIP );
 		
 		$cat = explode("_", $instance['category']);
-		$term = $cat[0];
-		$term_id = intval($cat[1]);
+		$instance['source'] = $cat[0];
 		if ( $instance['source'] == 'links' ) {
-			$term_id = intval($cat[2]);
-			$results = get_bookmarks( array('category' => $term_id) );
+			$slides = get_bookmarks( array('category' => intval($cat[3])) );
 		} elseif ( $instance['source'] == 'posts' ){
 			// Get either n latest posts or posts from specific category
-			if ($term == 'latest') {
-				$query = new WP_Query( array('posts_per_page' => $term_id, 'orderby' => 'date', 'order' => 'DESC') );
+			if ($cat[1] == 'latest') {
+				$query = new WP_Query( array('posts_per_page' => intval($cat[2]), 'orderby' => 'date', 'order' => 'DESC') );
 			} else {
-				$query = new WP_Query( array('posts_per_page' => -1, 'cat' => $term_id, 'orderby' => 'date', 'order' => 'DESC') );
+				$query = new WP_Query( array('posts_per_page' => -1, 'cat' => intval($cat[2]), 'orderby' => 'date', 'order' => 'DESC') );
 			}
-			$results = $query->posts;
+			$slides = $query->posts;
 		} elseif ( $instance['source'] == 'images' ) {
-			//$query = new WP_Query(array('posts_per_page' => -1, 'post_type' => 'attachment', 'post_status' => 'inherit', 'cat' => $term_id));
 			$query = new WP_Query(array(
 				'posts_per_page' => -1,
 				'post_type' => 'attachment',
@@ -191,40 +218,55 @@ class SponsorsSlideshowWidget extends WP_Widget
 					array(
 						'taxonomy' => 'gallery',
 						'field' => 'term_id',
-						'terms' => $term_id
+						'terms' => intval($cat[2])
 					)
 				)
 			));
-			$results = $query->posts;
+			$slides = $query->posts;
+		} elseif ( $instance['source'] == 'pages' ) {
+			$query = new WP_Query(array(
+				'posts_per_page' => -1,
+				'post_type' => 'page',
+				'post_status' => 'published',
+				'tax_query' => array(
+					array(
+						'taxonomy' => 'page_category',
+						'field' => 'term_id',
+						'terms' => intval($cat[3])
+					)
+				)
+			));
+			$slides = $query->posts;
 		} else {
-			$results = false;
+			// get slides from external source
+			$slides = apply_filters( 'fancy_slideshow_get_slides_'.$instance['source'], $cat );
+			
+			/*
+			 * Enforce some security policy
+			 *
+			 * 1) Disallow images on different host
+			 * 2) Disallow external links to other hosts
+			 */
+			$s = 0;
+			$myhost = $this->getBaseURL( get_option('siteurl') );
+			foreach ( $slides AS $slide ) {
+				// Remove images from external host
+				if ( $this->getBaseURL( $slide->image ) != $myhost )
+					$slides[$s]->image = "";
+				
+				// Remove external links
+				if ( $this->getBaseURL( $slide->url ) != $myhost ) {
+					$slides[$s]->url = "";
+					$slides[$s]->url_target = "";
+				}
+				
+				$s++;
+			}
 		}
 		
-		if ( $results ) {
-			?>
-			<script type='text/javascript'>
-			//<![CDATA[
-				// Make overflow of slideshow container hidden
-				var $jq = jQuery.noConflict();
-				$jq(document).ready(function() {
-					$jq("#fancy-slideshow-<?php echo $number ?>-container").css("overflow", "hidden");
-				});
-				
-				jQuery('#fancy-slideshow-<?php echo $number ?>').cycle({
-					fx: '<?php echo $instance['fade']; ?>',
-					timeout: <?php echo (float)$instance['timeout'] * 1000; ?>,
-					next: '#fancy-slideshow-<?php echo $number ?>-next',
-					prev: '#fancy-slideshow-<?php echo $number ?>-prev',
-					speed: <?php echo (float)$instance['speed'] * 1000; ?>,
-					random: <?php echo intval($instance['order']); ?>,
-					pager: '#fancy-slideshow-nav-<?php echo $number ?>',
-					pause: 1,
-					resume: 1
-				});
-			//});
-			//]]>
-			</script>
-			<?php
+		if ( $slides ) {
+			$num_slides = count($slides);
+			
 			$out = $before_widget;
 
 			if (!isset($instance['title'])) $instance['title'] = '';
@@ -237,22 +279,100 @@ class SponsorsSlideshowWidget extends WP_Widget
 			if (isset($instance['show_navigation_arrows']) && $instance['show_navigation_arrows'] == 1)
 			$out .= '<a href="#" class="prev" id="fancy-slideshow-'.$number.'-prev"><span>&lt;</span></a>';
 			
-			$out .= '<div id="fancy-slideshow-'.$number.'" class="fancy-slideshow slides">';
+			$fx = explode("_", $instance['fade']);
+			$fade = $fx[0];
+			$options = "";
+			if ( in_array($fade, array('tileSlide', 'tileBlind')) ) {
+				// horizontal tile
+				if ( isset($fx[1]) )
+					$options .= " data-cycle-tile-vertical=false";
+				
+				$options .= " data-cycle-tile-count=10";
+			} elseif ( $fade == "carousel" ) {
+				if ( !isset($instance['carousel_num_slides']) || (isset($instance['carousel_num_slides']) && intval($instance['carousel_num_slides']) == 0) )
+					$instance['carousel_num_slides'] = 3;
+				
+				$options .=  " data-cycle-carousel-visible=".$instance['carousel_num_slides']." data-cycle-carousel-fluid=true";
+			}
+			
+			// Setup pager template
+			$pager_template = "<a href='#'></a>";
+			if ( $instance['navigation_pager'] == 'thumbs' ) {
+				if ( $num_slides == 2 ) $mar_thumbs = 1;
+				if ( $num_slides > 2 ) $mar_thumbs = $num_slides/(($num_slides-1)*2);
+				
+				$pager_template = "<a href='#' style='width: ".(100/$num_slides)."%;' class='{{API.customGetImageClass}}'><img src='{{API.customGetImageSrc}}' style='width: ".((100/$num_slides)-1)."%; margin: 0 ".$mar_thumbs."%;' /></a>";
+			}
+			
+			// Setup Slide Overlay
+			$overlay_template = "";
+			if ( $instance['overlay']['display'] != "none" ) {
+				if ( $instance['overlay']['display'] == "title" )
+					$overlay_template = "<span class='title'>{{title}}</span>";
+				
+				if ( $instance['overlay']['display'] == "description" )
+					$overlay_template = "<span class='description'>{{desc}}</span>";
+				
+				if ( $instance['overlay']['display'] == "all" )
+					$overlay_template = "<span class='title'>{{title}}</span><span class='description'>{{desc}}</span>";
+			
+				// Setup overlay effects selector			
+				if ( $instance['overlay']['animate'] == "content" )
+					$options .= " data-cycle-overlay-fx-sel='>span'";
+				
+				// Setup overlay animation effects
+				if ( $instance['overlay']['effect'] != "none" ) {
+					// activate cycle-caption-plugin caption2 for animated captions and overlays
+					$options .= " data-cycle-caption-plugin=caption2";
+					
+					// set overlay animation to slide up & down (default: fade)
+					if ( $instance['overlay']['effect'] == "slide_up_down" )
+						$options .= " data-cycle-overlay-fx-out=slideUp data-cycle-overlay-fx-in=slideDown";
+				}	
+			}
+			
+			// Set Easing effect
+			if ( $instance['easing'] != 'none' ) {
+				$options .= " data-cycle-easing=".$instance['easing'];
+			}
+			
+			
+			$out .= '<ul id="fancy-slideshow-'.$number.'" class="fancy-slideshow slides cycle-slideshow '.$instance['source'].'"
+				data-cycle-fx="'.$fade.'"
+				data-cycle-slides="> li"
+				data-cycle-pause-on-hover="true"
+				data-cycle-speed="'.((float)$instance['speed'] * 1000).'"
+				data-cycle-timeout="'.((float)$instance['timeout'] * 1000).'"
+				data-cycle-next="#fancy-slideshow-'.$number.'-next"
+				data-cycle-prev="#fancy-slideshow-'.$number.'-prev"
+				data-cycle-pager="#fancy-slideshow-nav-'.$number.'"
+				data-cycle-pager-template="'.$pager_template.'"
+				data-cycle-random="'.intval($instance['order']).'"
+				data-cycle-overlay-template="'.$overlay_template.'"
+				'.$options.'
+			>';
+			
+			// Only show overlay div if we want to have it
+			if ( $instance['overlay']['display'] != "none" )
+				$out .= '<div class="cycle-overlay '.$instance['overlay']['style'].'"></div>';
 			
 			$i = 0;
-			foreach ( $results AS $item ) {
+			foreach ( $slides AS $slide ) {
 				$i++;
 				
 				if ( $instance['source'] == 'links' ) {
-					$item->name = $item->link_name;
-					$item->image = $item->link_image;
-					$item->url = $item->link_url;
-					$item->url_target = $item->link_target;
-					$item->link_class = '';
-					$item->link_rel = 'nofollow';
-					$item->title = $item->name;
+					$slide->name = $slide->link_name;
+					$slide->image = $slide->link_image;
+					$slide->url = $slide->link_url;
+					$slide->url_target = $slide->link_target;
+					$slide->link_class = '';
+					$slide->link_rel = 'nofollow';
+					$slide->title = $slide->name;
+					
+					$slide->slide_title = "";
+					$slide->slide_desc = "";
 				}
-				if ( $instance['source'] == 'posts' ) {
+				if ( in_array($instance['source'], array('posts', 'pages')) ) {
 					$thumb_size = array(intval($instance['height']), intval($instance['width']));
 					
 					// determine thumbnail sizes
@@ -264,68 +384,93 @@ class SponsorsSlideshowWidget extends WP_Widget
 					if ($thumb_size[0] == 0 && $thumb_size[1] == 0)
 						$thumb_size = 'full';
 					
-					$item->name = $item->post_title;
-					$item->image = wp_get_attachment_url( get_post_thumbnail_id($item->ID, $thumb_size) );
-					$item->url = get_permalink($item->ID);
-					$item->url_target = '';
-					$item->link_class = '';
-					$item->link_rel = '';
-					$item->title = $item->name;
+					$slide->name = $slide->post_title;
+					$slide->image = wp_get_attachment_url( get_post_thumbnail_id($slide->ID, $thumb_size) );
+					$slide->url = get_permalink($slide->ID);
+					$slide->url_target = '';
+					$slide->link_class = '';
+					$slide->link_rel = '';
+					$slide->title = $slide->name;
+					
+					// First get custom post meta data
+					$slide->slide_title = stripslashes(get_post_meta( $slide->ID, 'fancy_slideshow_overlay_title', true ));
+					$slide->slide_desc = stripslashes(get_post_meta( $slide->ID, 'fancy_slideshow_overlay_description', true ));
+			
+					// Fallback to default slide overlay if custom metadata is empty
+					if ( $slide->slide_title == "" ) $slide->slide_title = get_the_title($slide->ID);
+					if ( $slide->slide_desc == "" ) $slide->slide_desc = $this->getPostExcerpt($slide->ID, $instance['post_excerpt_length']);
+					
+					$slide->slide_desc .= sprintf( "<span class='continue'><a href='%s'>%s</a></span>", $slide->url, __('Continue Reading', 'sponsors-slideshow') );
 				}
 				if ( $instance['source'] == 'images' ) {
-					$item->name = $item->post_title;
-					$item->image = $item->guid;
-					$item->url = $item->guid;
-					$item->url_target = '';
-					$item->link_class = 'thickbox';
-					//$item->link_rel = sprintf("slideshow-%d", $number);
-					$item->link_rel = '';
+					$slide->name = $slide->post_title;
+					$slide->image = $slide->guid;
+					$slide->url = $slide->guid;
+					$slide->url_target = '';
+					$slide->link_class = 'thickbox';
+					//$slide->link_rel = sprintf("slideshow-%d", $number);
+					$slide->link_rel = '';
 					
-					if ( $item->post_content != "" )
-						$item->title = stripslashes(htmlspecialchars($item->post_content));
-					elseif ( $item->post_excerpt != "" )
-						$item->title = stripslashes(htmlspecialchars($item->post_excerpt));
+					if ( $slide->post_content != "" )
+						$slide->title = stripslashes(htmlspecialchars($slide->post_content));
+					elseif ( $slide->post_excerpt != "" )
+						$slide->title = stripslashes(htmlspecialchars($slide->post_excerpt));
 					else
-						$item->title = $item->name;
+						$slide->title = htmlspecialchars($slide->name);
+					
+					$slide->slide_title = stripslashes(htmlspecialchars($slide->post_excerpt));
+					$slide->slide_desc = "";
 				}
-
-				if ( $item->image != "" )
-					$text = sprintf('<img src="%s" alt="%s" title="%s" />', esc_url($item->image), $item->name, $item->title);
+				
+				if ( $slide->image != "" )
+					$text = sprintf('<img src="%s" alt="%s" title="%s" />', esc_url($slide->image), htmlspecialchars($slide->name), $slide->title);
 				else
-					$text = $item->name;
+					$text = $slide->name;
 				
-				$out .= '<div id="slideshow-'.$number.'-slide-'.$i.'" class="slide">';
+				$slideshow_class = '';
+				if ( $i == 1 ) $slideshow_class = ' first-slide';
+				if ( $i == count($slides) ) $slideshow_class = ' last-slide';
+				$out .= '<li id="slideshow-'.$number.'-slide-'.$i.'" class="slide'.$slideshow_class.'" data-cycle-title="'.$slide->slide_title.'" data-cycle-desc="'.$slide->slide_desc.'">';
 				
-				if ( $item->url != '' ) {
-					$target = ($item->url_target != "") ? 'target="'.$item->url_target.'"' : '';
-					$out .= sprintf('<a class="%s" href="%s" %s title="%s" rel="%s">%s</a>', $item->link_class, esc_url($item->url), $target, $item->title, $item->link_rel, $text);
+				if ( $slide->url != '' ) {
+					$target = ($slide->url_target != "") ? 'target="'.$slide->url_target.'"' : '';
+					$out .= sprintf('<a class="%s" href="%s" %s title="%s" rel="%s">%s</a>', $slide->link_class, esc_url($slide->url), $target, $slide->title, $slide->link_rel, $text);
 				} else {
 					$out .= $text;
 				}
 				
-				if ( $instance['source'] == 'posts' ) {
+				// Add Featured Post Layer containing title and excerpt 
+				/*if ( $instance['source'] == 'posts' ) {
+					$out .= sprintf('<a class="%s" href="%s" %s title="%s" rel="%s">', $slide->link_class, esc_url($slide->url), $target, $slide->title, $slide->link_rel);
 					$out .= "<div class='featured-post'>";
-					$out .= "<h2 class='featured-post-title'>".get_the_title($item->ID).'</h2>';
-					$out .= "<p class='featured-post-excerpt'>".$this->getPostExcerpt($item->ID, $instance['post_excerpt_length'])."</p>";
+					$out .= "<h2 class='featured-post-title'>".get_the_title($slide->ID).'</h2>';
+					$out .= "<p class='featured-post-excerpt'>".$this->getPostExcerpt($slide->ID, $instance['post_excerpt_length'])."</p>";
 					$out .= "</div>";
+					$out .= "</a>";
 				}
 				
-				$out .= '</div>';
+				// Add Image Caption Layer
+				if ( $fade != "carousel" && $instance['source'] == 'images' && $slide->post_excerpt != "" ) {
+					$out .= "<div class='image-caption'>";
+					$out .= "<p>".stripslashes(htmlspecialchars($slide->post_excerpt))."</p>";
+					$out .= "</div>";
+				}*/
+				$out .= '</li>';
 			}
-			$out .= '</div>';
+			$out .= '</ul>';
 			
-			// Slideshow Button Navigation
-			if (isset($instance['show_pager']) && $instance['show_pager'] == 1) {
-				// Each link is 1.5em in width with 0.3571em margin left and right
-				$max_width = 2.2143 * count($results);
-				$class = ( $instance['source'] == 'posts' ) ? 'posts' : '';
-				$out .= '<div class="fancy-slideshow-nav-container '.$class.'"><nav id="fancy-slideshow-nav-'.$number.'" class="fancy-slideshow-nav" style="max-width: '.$max_width.'em"></nav></div>';
-			}
+			
 			
 			if (isset($instance['show_navigation_arrows']) && $instance['show_navigation_arrows'] == 1)
 			$out .= '<a href="#" class="next" id="fancy-slideshow-'.$number.'-next"><span>&gt;</span></a>';
 		
 			$out .= '</div>';
+			
+			// Slideshow Button/Thumbnail Navigation
+			if (isset($instance['navigation_pager']) && in_array($instance['navigation_pager'], array("buttons", "thumbs")) ) {
+				$out .= '<div class="fancy-slideshow-nav-container '.$instance['source'].'"><nav id="fancy-slideshow-nav-'.$number.'" class="fancy-slideshow-nav '.$instance['navigation_pager'].'"></nav></div>';
+			}
+			$out .= "\n".$this->getSlideshowJavascript( $number, $instance, count($slides) );
 			$out .= $after_widget;
 			
 			if ( isset($instance['shortcode']) && $instance['shortcode'] )
@@ -344,19 +489,24 @@ class SponsorsSlideshowWidget extends WP_Widget
 	function shortcode( $atts )
 	{
 		extract(shortcode_atts(array(
-			'source' => '',
 			'category' => '',
-			'width' => '',
-			'height' => '',
+			'width' => "",
+			'height' => "",
 			'fade' => 'scrollHorz',
 			'timeout' => 3,
 			'speed' => 3,
 			'post_excerpt_length' => 100,
 			'show_navigation_arrows' => 1,
-			'show_pager' => 1,
+			'navigation_pager' => 'buttons',
 			'align' => 'aligncenter',
 			'box' => 'true',
-			'random' => 0
+			'random' => 0,
+			'overlay' => 'all',
+			'overlay_fx_sel' => 'content',
+			'overlay_fade' => 'fade',
+			'overlay_style' => 'default',
+			'easing' => 'none',
+			'carousel_num_slides' => 4
 		), $atts ));
 
 		// generate unique ID for shortcode
@@ -367,7 +517,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 		
 		// widget parameters
 		$args = array(
-			'before_widget' => '<div class="slideshow-shortcode '.implode(" ", $class).'">',
+			'before_widget' => '<div id="fancy-slideshow-shortcode-'.$number.'" class="fancy-slideshow-shortcode '.implode(" ", $class).'">',
 			'after_widget' => '</div>',
 			'before_title' => '',
 			'after_title' => '',
@@ -375,7 +525,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 		);
 		
 		// slideshow parameters
-		$instance = array( 'shortcode' => true, 'title' => '', 'source' => htmlspecialchars($source), 'category' => htmlspecialchars($category), 'width' => intval($width), 'height' => intval($height), 'fade' => htmlspecialchars($fade), 'timeout' => intval($timeout), 'speed' => intval($speed), 'order' => intval($random), 'post_excerpt_length' => intval($post_excerpt_length), 'show_navigation_arrows' => $show_navigation_arrows, 'show_pager' => $show_pager );
+		$instance = array( 'shortcode' => true, 'title' => '', 'category' => htmlspecialchars($category), 'width' => intval($width), 'height' => intval($height), 'fade' => htmlspecialchars($fade), 'timeout' => intval($timeout), 'speed' => intval($speed), 'order' => intval($random), 'post_excerpt_length' => intval($post_excerpt_length), 'show_navigation_arrows' => $show_navigation_arrows, 'navigation_pager' => $navigation_pager, 'overlay' => array('display' => $overlay, 'animate' => $overlay_fx_sel, 'effect' => $overlay_fade, 'style' => $overlay_style), 'easing' => $easing, 'carousel_num_slides' => $carousel_num_slides );
 		
 		// add slideshow CSS
 		$out = "<style type='text/css'>\n";
@@ -434,106 +584,91 @@ class SponsorsSlideshowWidget extends WP_Widget
 	*/
 	function form( $instance )
 	{
-		if ( !isset($instance['source']) || empty($instance['source']) ) {
-			$instance = array('source' => 'links', 'category' => '', 'show_navigation_arrows' => 1, 'show_pager' => 1, 'post_excerpt_length' => 0,  'num_latest_posts' => 0, 'title' => '', 'width' => '', 'height' => '', 'timeout' => '', 'speed' => '', 'fade' => '', 'order' => 0);
+		if ( !isset($instance['category']) || empty($instance['category']) ) {
+			$instance = array( 'source' => 'links', 'category' => '', 'show_navigation_arrows' => 1, 'navigation_pager' => 'buttons', 'post_excerpt_length' => 0,  'num_latest_posts' => 0, 'title' => '', 'width' => '', 'height' => '', 'timeout' => '', 'speed' => '', 'fade' => '', 'easing' => '', 'order' => 0, 'overlay' => array('display' => 'all', 'animate' => 'content', 'effect' => 'slide_up_down', 'style' => 'default'), 'carousel_num_slides' => 4 );
 		}
 		
 		echo '<div class="fancy-slideshow-control">';
-		echo '<p><label for="'.$this->get_field_id('source').'">'.__( 'Source', 'sponsors-slideshow' ).'</label>'.$this->sources($instance['source']).'</p>';
-		echo '<p><label for="'.$this->get_field_id('post_category').'">'.__( 'Category', 'sponsors-slideshow' ).'</label> '.$this->categories($instance['category']).'</p>';
+		echo '<p><label for="'.$this->get_field_id('source').'">'.__( 'Source', 'sponsors-slideshow' ).'</label>'.$this->sources($instance['category']).'</p>';
 		echo '<p><label for="'.$this->get_field_id('title').'">'.__('Title', 'sponsors-slideshow').'</label><input type="text" size="15" name="'.$this->get_field_name('title').'" id="'.$this->get_field_id('title').'" value="'.stripslashes($instance['title']).'" /></p>';
 		echo '<p><label for="'.$this->get_field_id('width').'">'.__( 'Width', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="'.$this->get_field_name('width').'" id="'.$this->get_field_id('width').'" value="'.intval($instance['width']).'" /> px</p>';
 		echo '<p><label for="'.$this->get_field_id('height').'">'.__( 'Height', 'sponsors-slideshow' ).'</label><input type="text" size="3" name="'.$this->get_field_name('height').'" id="'.$this->get_field_id('height').'" value="'.intval($instance['height']).'" /> px</p>';
 		echo '<p><label for="'.$this->get_field_id('timeout').'">'.__( 'Timeout', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('timeout').'" id="'.$this->get_field_id('timeout').'" size="3" value="'.(float)$instance['timeout'].'" /> '.__( 'seconds','sponsors-slideshow').'</p>';
 		echo '<p><label for="'.$this->get_field_id('speed').'">'.__( 'Speed', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('speed').'" id="'.$this->get_field_id('speed').'" size="3" value="'.(float)$instance['speed'].'" /> '.__( 'seconds', 'sponsors-slideshow').'</p>';
 		echo '<p><label for="'.$this->get_field_id('fade').'">'.__( 'Fade Effect', 'sponsors-slideshow' ).'</label>'.$this->fadeEffects($instance['fade']).'</p>';
+		if ( $instance['fade'] == "carousel" ) {
+			echo '<p><label for="'.$this->get_field_id('carousel_num_slides').'">'.__( 'Show', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('carousel_num_slides').'" id="'.$this->get_field_id('carousel_num_slides').'" size="3" value="'.$instance['carousel_num_slides'].'" /> '.__('slides', 'sponsors-slideshow').'</p>';
+		} else {
+			echo '<input type="hidden" name="'.$this->get_field_name('carousel_num_slides').'" id="'.$this->get_field_id('carousel_num_slides').'" value="'.$instance['carousel_num_slides'].'" />';
+		}
+		echo '<p><label for="'.$this->get_field_id('easing').'">'.__( 'Easing Effect', 'sponsors-slideshow' ).'</label>'.$this->easingEffects($instance['easing']).'</p>';
 		echo '<p><label for="'.$this->get_field_id('order').'">'.__('Order','sponsors-slideshow').'</label>'.$this->order($instance['order']).'</p>';
 		$checked_arrows = (isset($instance['show_navigation_arrows']) && $instance['show_navigation_arrows'] == 1) ? ' checked="checked"' : '';
-		//echo '<p><label for="'.$this->get_field_id('show_navigation_arrows').'">'.__('Navigation Arrows','sponsors-slideshow').'</label><input type="checkbox" name="'.$this->get_field_name('show_navigation_arrows').'" id="'.$this->get_field_id('show_navigation_arrows').'" value="1"'.$checked_arrows.' /><br style="clear: both;" /></p>';
-		$checked_pager = (isset($instance['show_pager']) && $instance['show_pager'] == 1) ? ' checked="checked"' : '';
-		//echo '<p><label for="'.$this->get_field_id('show_pager').'">'.__('Navigation Pager','sponsors-slideshow').'</label><input type="checkbox" name="'.$this->get_field_name('show_pager').'" id="'.$this->get_field_id('show_pager').'" value="1"'.$checked_pager.' /></p>';
-		echo '<p><label class="checkbox" for="'.$this->get_field_id('show_navigation_arrows').'">'.__('Navigation','sponsors-slideshow').'</label><input type="checkbox" name="'.$this->get_field_name('show_navigation_arrows').'" id="'.$this->get_field_id('show_navigation_arrows').'" value="1"'.$checked_arrows.' /><label class="right" for="'.$this->get_field_id('show_navigation_arrows').'">'.__('Arrows','sponsors-slideshow').'</label><input type="checkbox" name="'.$this->get_field_name('show_pager').'" id="'.$this->get_field_id('show_pager').'" value="1"'.$checked_pager.' /><label class="right" for="'.$this->get_field_id('show_pager').'">'.__('Pager','sponsors-slideshow').'</label></p>';
+		echo '<p><label class="checkbox" for="'.$this->get_field_id('show_navigation_arrows').'">'.__('Navigation Arrows','sponsors-slideshow').'</label><input type="checkbox" name="'.$this->get_field_name('show_navigation_arrows').'" id="'.$this->get_field_id('show_navigation_arrows').'" value="1"'.$checked_arrows.' /></p>';
+		$checked_pager_none = (isset($instance['navigation_pager']) && $instance['navigation_pager'] == 'none') ? ' checked="checked"' : '';
+		$checked_pager_buttons = (isset($instance['navigation_pager']) && $instance['navigation_pager'] == 'buttons') ? ' checked="checked"' : '';
+		$checked_pager_thumbs = (isset($instance['navigation_pager']) && $instance['navigation_pager'] == 'thumbs') ? ' checked="checked"' : '';
+		echo '<label class="radio" for="'.$this->get_field_id('navigation_pager_none').'">'.__('Pager','sponsors-slideshow').'</label><ul class="radio"><li><input type="radio" name="'.$this->get_field_name('navigation_pager').'" id="'.$this->get_field_id('navigation_pager_none').'" value="none"'.$checked_pager_none.' /><label class="right" for="'.$this->get_field_id('navigation_pager_none').'">'.__('Hide','sponsors-slideshow').'</label></li><li class="left"><input type="radio" name="'.$this->get_field_name('navigation_pager').'" id="'.$this->get_field_id('navigation_pager_buttons').'" value="buttons"'.$checked_pager_buttons.' /><label class="right" for="'.$this->get_field_id('navigation_pager_buttons').'">'.__('Buttons','sponsors-slideshow').'</label></li><li class="left"><input type="radio" name="'.$this->get_field_name('navigation_pager').'" id="'.$this->get_field_id('navigation_pager_thumbs').'" value="thumbs"'.$checked_pager_thumbs.' /><label class="right" for="'.$this->get_field_id('navigation_pager_thumbs').'">'.__('Thumbnails','sponsors-slideshow').'</label></li></ul></p>';
 		echo '<p><label for="'.$this->get_field_id('post_excerpt_length').'">'.__( 'Post Excerpt', 'sponsors-slideshow' ).'</label><input type="text" name="'.$this->get_field_name('post_excerpt_length').'" id="'.$this->get_field_id('post_excerpt_length').'" value="'.intval($instance['post_excerpt_length']).'" size="5" /> '.__('words', 'sponsors-slideshow').'</p>';
+		echo '<h4 class="slide-overlay">'.__( 'Slide Overlay', 'sponsors-slideshow' ).'</h4>';
+		echo '<p><label for="'.$this->get_field_id('overlay_display').'">'.__('Display','sponsors-slideshow').'</label>'.$this->overlayDisplay($instance['overlay']['display']).'</p>';
+		echo '<p><label for="'.$this->get_field_id('overlay_effect').'">'.__('Fade Effect','sponsors-slideshow').'</label>'.$this->overlayEffects($instance['overlay']['effect']).'</p>';
+		echo '<p><label for="'.$this->get_field_id('overlay_animate').'">'.__('Animate','sponsors-slideshow').'</label>'.$this->overlayAnimate($instance['overlay']['animate']).'</p>';
+		echo '<p><label for="'.$this->get_field_id('overlay_style').'">'.__('Style','sponsors-slideshow').'</label>'.$this->overlayStyles($instance['overlay']['style']).'</p>';
 		echo '</div>';
 	}
 
-	
-	/**
-	 * drop down list of link sources
-	 *
-	 * @param string $selected current order
-	 * @return order selection
-	 */
-	function sources( $selected )
-	{
-		$sources = array( 'links' => __('Links', 'sponsors-slideshow'), 'images' => __('Images', 'sponsors-slideshow'), 'posts' => __('Posts', 'sponsors-slideshow') );
-		$out = "<select size='1' name='".$this->get_field_name('source')."' id='".$this->get_field_id('source')."'>";
-		foreach ( $sources AS $source => $name ) {
-			$checked =  ( $selected == $source ) ? " selected='selected'" : '';
-			$out .= '<option value="'.$source.'"'.$checked.'>'.$name.'</option>';
-		}
-		$out .= '</select>';
-		return $out;
-	}
-
 
 	/**
-	 * display categories as drop down list
+	 * display sources as drop down list
 	 *
-	 * @param string $term name of term
-	 * @param string $name field name
-	 * @param int $selected ID of selected category
+	 * @param string $selected selected category
+	 * @param string $field_name
+	 * @param string $field_id
 	 * @return select element of categories
 	 */
-	function categories( $selected )
+	function sources( $selected, $field_name = "", $field_id = "" )
 	{
-		$out = '<select size="1" name="'.$this->get_field_name("category").'" id="'.$this->get_field_id("category").'">';
-		$terms = array("Links" => "link_category", "Posts" => "category", "Images" => "gallery");
+		if ( $field_name == "" ) $field_name = $this->get_field_name("category");
+		if ( $field_id == "") $field_id = $this->get_field_id("category");
 		
-		foreach ($terms AS $label => $term) {
-			$categories = get_terms($term, 'orderby=name&hide_empty=0');
-			$out .= '<optgroup label="'.__($label, 'sponsors-slideshow').'">';
-			if (!empty($categories)) {
-				foreach ( $categories as $category ) {
-					$cat_id = $category->term_id;
-					$name = htmlspecialchars( apply_filters('the_category', $category->name));
-					$checked = ( $selected == $term."_".$cat_id ) ? ' selected="selected"' : '';
-					$out .= '<option value="'.$term."_".$cat_id.'"'.$checked.'>'.$name. '</option>';
+		$terms = array( "link_category" => array("label" => "Links", "source" => "links"), "category" => array("label" => "Posts", "source" => "posts"), "page_category" => array("label" => "Pages", "source" => "pages"), "gallery" => array("label" => "Images", "source" => "images"), "latest_posts" => array("label" => "Latest Posts", "source" => "posts") );
+		
+		$categories = array();
+		foreach ($terms AS $term => $data) {
+			if ( $term == "latest_posts" ) {
+				// Add special category for latest posts
+				$categories[$term] = array( "title" => __($data["label"], 'sponsors-slideshow'), "options" => array() );
+				for ($i = 1; $i <= 15; $i++) {
+					$categories[$term]["options"][] = array( "value" => $data["source"]."_latest_".$i, "label" => sprintf(__('Latest %d posts', 'sponsors-slideshow'), $i) );
+				}
+			} else {
+				$cat = get_terms($term, 'orderby=name&hide_empty=0');
+				if (!empty($cat)) {
+					$categories[$term] = array( "title" => __($data["label"], 'sponsors-slideshow'), "options" => array() );
+					foreach ( $cat as $category ) {
+						$cat_id = $category->term_id;
+						$categories[$term]["options"][] = array( "value" => $data["source"]."_".$term."_".$cat_id, "label" => htmlspecialchars( apply_filters('the_category', $category->name)) );
+					}
 				}
 			}
-			$out .= '</optgroup>';
 		}
 		
-		// Add special category for latest posts
-		$out .= '<optgroup label="'.__('Latest Posts', 'sponsors-slideshow').'">';
-		for ($i = 1; $i <= 15; $i++) {
-			$checked = ( $selected == sprintf('latest_%d', $i) ) ? ' selected="selected"' : '';
-			$out .= '<option value="latest_'.$i.'"'.$checked.'>'.sprintf(__('Latest %d posts', 'sponsors-slideshow'), $i).'</option>';
-		}
-		$out .= '</optgroup>';
+		$categories = apply_filters( 'fancy_slideshow_sources', $categories );
 		
-		$out .= '</select>';
-	
-		return $out;
-	}
-	
-
-	/**
-	* drop down list of available fade effects
-	*
-	* @param string $selected current effect
-	* @return select element of fade effects
-	*/
-	function fadeEffects( $selected )
-	{
-		$effects = array( __('Blind X','sponsors-slideshow') => 'blindX', __('Blind Y','sponsors-slideshow') => 'blindY', __('Blind Z','sponsors-slideshow') => 'blindZ', __('Cover','sponsors-slideshow') => 'cover', __('Curtain X','sponsors-slideshow') => 'curtainX', __('Curtain Y','sponsors-slideshow') => 'curtain>', __('Fade','sponsors-slideshow') => 'fade', __('Fade Zoom','sponsors-slideshow') => 'fadeZoom', __('Scroll Up','sponsors-slideshow') => 'scrollUp', __('Scroll Left','sponsors-slideshow') => 'scrollLeft', __('Scroll Right','sponsors-slideshow') => 'scrollRight', __('Scroll Down','sponsors-slideshow') => 'scrollDown', __('Scroll Horizontal', 'sponsors-slideshow') => 'scrollHorz', __('Scroll Vertical', 'sponsors-slideshow') => 'scrotllVert', __('Shuffle','sponsors-slideshow') => 'shuffle', __('Slide X','sponsors-slideshow') => 'slideX', __('Slide Y','sponsors-slideshow') => 'slideY', __('Toss','sponsors-slideshow') => 'toss', __('Turn Up','sponsors-slideshow') => 'turnUp', __('Turn Down','sponsors-slideshow') => 'turnDown', __('Turn Left','sponsors-slideshow') => 'turnLeft', __('Turn Right','sponsors-slideshow') => 'turnRight', __('Uncover','sponsors-slideshow') => 'uncover', __('Wipe','sponsors-slideshow') => 'wipe', __( 'Zoom','sponsors-slideshow') => 'zoom', __('Grow X','sponsors-slideshow') => 'growX', __('Grow Y','sponsors-slideshow') => 'growY', __('Random','sponsors-slideshow') => 'all');
-		
-		$out = '<select size="1" name="'.$this->get_field_name('fade').'" id="'.$this->get_field_id('fade').'">';
-		foreach ( $effects AS $name => $effect ) {
-			$checked =  ( $selected == $effect ) ? " selected='selected'" : '';
-			$out .= '<option value="'.$effect.'"'.$checked.'>'.$name.'</option>';
+		$out = '<select size="1" name="'.$field_name.'" id="'.$field_id.'">';
+		if ( count($categories) ) {
+			foreach ( $categories AS $term => $category ) {
+				$out .= '<optgroup label="'.$category['title'].'">';
+				foreach ( $category["options"] AS $option ) {
+					$sel = ( $option["value"] == $selected ) ? ' selected="selected"' : '';
+					$out .= '<option value="'.$option["value"].'"'.$sel.'>'.$option["label"]. '</option>';
+				}
+				$out .= '</optgroup>';
+			}
 		}
 		$out .= '</select>';
+	
 		return $out;
 	}
 	
@@ -542,12 +677,17 @@ class SponsorsSlideshowWidget extends WP_Widget
 	 * drop down list of order possibilities
 	 *
 	 * @param string $selected current order
+	 * @param string $field_name
+	 * @param string $field_id
 	 * @return order selection
 	 */
-	function order( $selected )
+	function order( $selected, $field_name = "", $field_id = "" )
 	{
+		if ( $field_name == "" ) $field_name = $this->get_field_name("order");
+		if ( $field_id == "") $field_id = $this->get_field_id("order");
+		
 		$order = array(__('Ordered','sponsors-slideshow') => '0', __('Random','sponsors-slideshow') => '1');
-		$out = '<select size="1" name="'.$this->get_field_name('order').'" id="'.$this->get_field_id('order').'">';
+		$out = '<select size="1" name="'.$field_name.'" id="'.$field_id.'">';
 		foreach ( $order AS $name => $value ) {
 			$checked =  ( $selected == $value ) ? " selected='selected'" : '';
 			$out .= '<option value="'.$value.'"'.$checked.'>'.$name.'</option>';
@@ -556,6 +696,198 @@ class SponsorsSlideshowWidget extends WP_Widget
 		return $out;
 	}
 
+	
+	/**
+	 * drop down list of overlay display
+	 *
+	 * @param string $selected current display
+	 * @param string $field_name
+	 * @param string $field_id
+	 * @return order selection
+	 */
+	function overlayDisplay( $selected, $field_name = "", $field_id = "" )
+	{
+		if ( $field_name == "" ) $field_name = $this->get_field_name("overlay][display");
+		if ( $field_id == "") $field_id = $this->get_field_id("overlay_display");
+	
+		$display = array( 'none' => __('No Overlay','sponsors-slideshow'), 'title' => __('Title','sponsors-slideshow'), 'all' => __('Title & Description', 'sponsors-slideshow') );
+		$out = '<select size="1" name="'.$field_name.'" id="'.$field_id.'">';
+		foreach ( $display AS $value => $name ) {
+			$checked =  ( $selected == $value ) ? " selected='selected'" : '';
+			$out .= '<option value="'.$value.'"'.$checked.'>'.$name.'</option>';
+		}
+		$out .= '</select>';
+		return $out;
+	}
+	
+	
+	/**
+	 * drop down list of overlay display
+	 *
+	 * @param string $selected current animation
+	 * @param string $field_name
+	 * @param string $field_id
+	 * @return order selection
+	 */
+	function overlayAnimate( $selected, $field_name = "", $field_id = "" )
+	{
+		if ( $field_name == "" ) $field_name = $this->get_field_name("overlay][animate");
+		if ( $field_id == "") $field_id = $this->get_field_id("overlay_animate");
+	
+		$animations = array( 'overlay' => __('Overlay Box','sponsors-slideshow'), 'content' => __('Overlay Content','sponsors-slideshow') );
+		$out = '<select size="1" name="'.$field_name.'" id="'.$field_id.'">';
+		foreach ( $animations AS $value => $name ) {
+			$checked =  ( $selected == $value ) ? " selected='selected'" : '';
+			$out .= '<option value="'.$value.'"'.$checked.'>'.$name.'</option>';
+		}
+		$out .= '</select>';
+		return $out;
+	}
+	
+	
+	/**
+	 * drop down list of overlay display
+	 *
+	 * @param string $selected current effect
+	 * @param string $field_name
+	 * @param string $field_id
+	 * @return order selection
+	 */
+	function overlayEffects( $selected, $field_name = "", $field_id = "" )
+	{
+		if ( $field_name == "" ) $field_name = $this->get_field_name("overlay][effect");
+		if ( $field_id == "") $field_id = $this->get_field_id("overlay_effect");
+	
+		$effects = array( 'none' => __('None','sponsors-slideshow'), 'fade' => __('Fade','sponsors-slideshow'), 'slide_up_down' => __('Slide Up & Down', 'sponsors-slideshow') );
+		$out = '<select size="1" name="'.$field_name.'" id="'.$field_id.'">';
+		foreach ( $effects AS $value => $name ) {
+			$checked =  ( $selected == $value ) ? " selected='selected'" : '';
+			$out .= '<option value="'.$value.'"'.$checked.'>'.$name.'</option>';
+		}
+		$out .= '</select>';
+		return $out;
+	}
+	
+	
+	/**
+	 * drop down list of overlay display styles
+	 *
+	 * @param string $selected current style
+	 * @param string $field_name
+	 * @param string $field_id
+	 * @return order selection
+	 */
+	function overlayStyles( $selected, $field_name = "", $field_id = "" )
+	{
+		if ( $field_name == "" ) $field_name = $this->get_field_name("overlay][style");
+		if ( $field_id == "") $field_id = $this->get_field_id("overlay_style");
+	
+		$styles = array( 'default' => __('Default','sponsors-slideshow'), 'fancy' => __('Fancy','sponsors-slideshow') );
+		$styles = apply_filters( 'fancy_slideshow_overlay_styles', $styles );
+		
+		$out = '<select size="1" name="'.$field_name.'" id="'.$field_id.'">';
+		foreach ( $styles AS $value => $name ) {
+			$checked =  ( $selected == $value ) ? " selected='selected'" : '';
+			$out .= '<option value="'.$value.'"'.$checked.'>'.$name.'</option>';
+		}
+		$out .= '</select>';
+		return $out;
+	}
+	
+	
+	/**
+	* drop down list of available fade effects
+	*
+	* @param string $field_name
+	* @param string $field_id
+	* @return order selection
+	*/
+	function fadeEffects( $selected, $field_name = "", $field_id = "" )
+	{
+		if ( $field_name == "" ) $field_name = $this->get_field_name("fade");
+		if ( $field_id == "") $field_id = $this->get_field_id("fade");
+		
+		$effects = array(
+			'fade' => __('Fade','sponsors-slideshow'),
+			'fadeout' => __('Fadeout', 'sponsors-slideshow'),
+			'scrollHorz' => __('Scroll Horizontal', 'sponsors-slideshow'),
+			'scrollVert' => __('Scroll Vertical', 'sponsors-slideshow'),
+			'flipHorz' => __('Flip Horizontal', 'sponsors-slideshow'),
+			'flipVert' => __('Flip Vertical', 'sponsors-slideshow'),
+			'shuffle' => __('Shuffle','sponsors-slideshow'),
+			'tileSlide' => __('Tile Slide', 'sponsors-slideshow'),
+			'tileSlide_horz' => __('Tile Slide Horizontal', 'sponsors-slideshow'),
+			'tileBlind' => __('Tile Blind', 'sponsors-slideshow'),
+			'tileBlind_horz' => __('Tile Blind Horizontal', 'sponsors-slideshow'),
+			'carousel' => __('Carousel', 'sponsors-slideshow')
+		);
+		
+		$out = '<select size="1" name="'.$field_name.'" id="'.$field_id.'">';
+		foreach ( $effects AS $effect => $name ) {
+			$checked =  ( $selected == $effect ) ? " selected='selected'" : '';
+			$out .= '<option value="'.$effect.'"'.$checked.'>'.$name.'</option>';
+		}
+		$out .= '</select>';
+		return $out;
+	}
+
+	
+	/**
+	 * get easing effects
+	 *
+	 * @param string $field_name
+	 * @param string $field_id
+	 * @return order selection
+	 */
+	function easingEffects( $selected, $field_name = "", $field_id = "" )
+	{
+		if ( $field_name == "" ) $field_name = $this->get_field_name("easing");
+		if ( $field_id == "") $field_id = $this->get_field_id("easing");
+		
+		$effects = array(
+			'none' => __( 'None', 'sponsors-slideshow' ),
+			'swing' => __( 'Swing', 'sponsors-slideshow' ),
+			'easeInQuad' => __( 'Ease In Quad', 'sponsors-slideshow' ),
+			'easeOutQuad' => __( 'Ease Out Quad', 'sponsors-slideshow' ),
+			'easeInOutQuad' => __( 'Ease In Out Quad', 'sponsors-slideshow' ),
+			'easeInCubic' => __( 'Ease In Cubic', 'sponsors-slideshow' ),
+			'easeOutCubic' => __( 'Ease Out Cubic', 'sponsors-slideshow' ),
+			'easeInOutCubic' => __( 'Ease In Out Cubic', 'sponsors-slideshow' ),
+			'easeInQuart' => __( 'Ease In Quart', 'sponsors-slideshow' ),
+			'easeOutQuart' => __( 'Ease Out Quart', 'sponsors-slideshow' ),
+			'easeInOutQuart' => __( 'Ease In Out Quart', 'sponsors-slideshow' ),
+			'easeInQuint' => __( 'Ease In Quint', 'sponsors-slideshow' ),
+			'easeOutQuint' => __( 'Ease Out Quint', 'sponsors-slideshow' ),
+			'easeInOutQuint' => __( 'Ease In Out Quint', 'sponsors-slideshow' ),
+			'easeInSine' => __( 'Ease In Sine', 'sponsors-slideshow' ),
+			'easeOutSine' => __( 'Ease Out Sine', 'sponsors-slideshow' ),
+			'easeInOutSine' => __( 'Ease In Out Sine', 'sponsors-slideshow' ),
+			'easeInExpo' => __( 'Ease In Expo', 'sponsors-slideshow' ),
+			'easeOutExpo' => __( 'Ease Out Expo', 'sponsors-slideshow' ),
+			'easeInOutExpo' => __( 'Ease In Out Expo', 'sponsors-slideshow' ),
+			'easeInCirc' => __( 'Ease In Circ', 'sponsors-slideshow' ),
+			'easeOutCirc' => __( 'Ease Out Circ', 'sponsors-slideshow' ),
+			'easeInOutCirc' => __( 'Ease In Out Circ', 'sponsors-slideshow' ),
+			'easeInElastic' => __( 'Ease In Elastic', 'sponsors-slideshow' ),
+			'easeOutElastic' => __( 'Ease Out Elastic', 'sponsors-slideshow' ),
+			'easeInOutElastic' => __( 'Ease In Out Elastic', 'sponsors-slideshow' ),
+			'easeInBack' => __( 'Ease In Back', 'sponsors-slideshow' ),
+			'easeOutBack' => __( 'Ease Out Back', 'sponsors-slideshow' ),
+			'easeInOutBack' => __( 'Ease In Out Back', 'sponsors-slideshow' ),
+			'easeInBounce' => __( 'Ease In Bounce', 'sponsors-slideshow' ),
+			'easeOutBounce' => __( 'Ease Out Bounce', 'sponsors-slideshow' ),
+			'easeInOutBounce' => __( 'Ease In Out Bounce', 'sponsors-slideshow' )
+		);
+		
+		$out = '<select size="1" name="'.$field_name.'" id="'.$field_id.'">';
+		foreach ( $effects AS $effect => $name ) {
+			$checked =  ( $selected == $effect ) ? " selected='selected'" : '';
+			$out .= '<option value="'.$effect.'"'.$checked.'>'.$name.'</option>';
+		}
+		$out .= '</select>';
+		return $out;
+	}
+	
 	
 	/**
 	 * install plugin
@@ -610,7 +942,15 @@ class SponsorsSlideshowWidget extends WP_Widget
 		unset($options['_multiwidget']);
 		
 		wp_enqueue_style( 'fancy-slideshow', $this->plugin_url.'style.css', array(), $this->version, 'all' );
-		wp_enqueue_script( 'jquery_slideshow', $this->plugin_url.'js/jquery.cycle.all.js', array('jquery'), '2.65' );
+		//wp_enqueue_script( 'jquery_slideshow', $this->plugin_url.'js/jquery.cycle.all.js', array('jquery', 'thickbox'), '2.65' );
+		wp_enqueue_script( 'jquery_cycle2', $this->plugin_url.'js/jquery.cycle2.min.js', array('jquery', 'thickbox'), '2.65' );
+		wp_enqueue_script( 'jquery_cycle2_carousel', $this->plugin_url.'js/jquery.cycle2.carousel.min.js', array('jquery_cycle2'), '2.65' );
+		wp_enqueue_script( 'jquery_cycle2_flip', $this->plugin_url.'js/jquery.cycle2.flip.min.js', array('jquery_cycle2'), '2.65' );
+		wp_enqueue_script( 'jquery_cycle2_scrollVert', $this->plugin_url.'js/jquery.cycle2.scrollVert.min.js', array('jquery_cycle2'), '2.65' );
+		wp_enqueue_script( 'jquery_cycle2_shuffle', $this->plugin_url.'js/jquery.cycle2.shuffle.min.js', array('jquery_cycle2'), '2.65' );
+		wp_enqueue_script( 'jquery_cycle2_tile', $this->plugin_url.'js/jquery.cycle2.tile.min.js', array('jquery_cycle2'), '2.65' );
+		wp_enqueue_script( 'jquery_cycle2_caption2', $this->plugin_url.'js/jquery.cycle2.caption2.min.js', array('jquery_cycle2'), '2.65' );
+		wp_enqueue_script( 'jquery_easing', $this->plugin_url.'js/jquery.easing.1.3.js', array('jquery_cycle2', 'jquery_cycle2_shuffle'), '2.65' );
 
 		// add inline CSS for each slideshow widget
 		foreach ($options AS $number => $instance)
@@ -629,7 +969,7 @@ class SponsorsSlideshowWidget extends WP_Widget
 	{
 		$css = "";
 		if (intval($instance['height']) > 0 || intval($instance['width']) > 0) {
-			$css .= "#fancy-slideshow-".$number."-container, #fancy-slideshow-".$number."-container img { ";
+			$css .= "#fancy-slideshow-".$number."-container, #fancy-slideshow-".$number.", #fancy-slideshow-".$number."-container img, #fancy-slideshow-shortcode-".$number." { ";
 			if (intval($instance['height']) > 0) {
 				$css .= "height: ".intval($instance['height'])."px;";
 				$css .= "max-height: ".intval($instance['height'])."px;";
@@ -655,6 +995,88 @@ class SponsorsSlideshowWidget extends WP_Widget
 	
 	
 	/**
+	 * get slideshow Javascript code
+	 *
+	 * @param int $number
+	 * @param array instance
+	 * @param int $num_slides
+	 */
+	function getSlideshowJavascript( $number, $instance, $num_slides )
+	{
+		if ( $num_slides == 2 ) $mar_thumbs = 1;
+		if ( $num_slides > 2 ) $mar_thumbs = $num_slides/(($num_slides-1)*2);
+		ob_start();
+		?>
+		<script type='text/javascript'>
+				var $jq = jQuery.noConflict();
+				$jq(document).ready(function() {
+					// Make overflow of slideshow container visible
+					$jq("#fancy-slideshow-<?php echo $number ?>-container").css("overflow", "visible");
+					// Show navigation pager
+					$jq("#fancy-slideshow-nav-<?php echo $number ?>").css("display", "inline-block");
+					
+					// fade-in navigation arrows on hover of slideshow container
+					$jq("#fancy-slideshow-<?php echo $number ?>-container").hover(
+						function() {
+							$jq("#fancy-slideshow-<?php echo $number ?>-next").fadeIn("slow");
+							$jq("#fancy-slideshow-<?php echo $number ?>-prev").fadeIn("slow");
+						}
+					);
+					
+					// fade-out navigation arrows when mouse leaves slideshow container
+					$jq("#fancy-slideshow-<?php echo $number ?>-container").mouseleave(
+						function() {
+							$jq("#fancy-slideshow-<?php echo $number ?>-next").fadeOut("slow");
+							$jq("#fancy-slideshow-<?php echo $number ?>-prev").fadeOut("slow");
+						}
+					);
+				});
+
+				
+				jQuery('.cycle-slideshow').on('cycle-bootstrap', function(e, opts, API) {
+					// add a new method to the C2 API:
+					API.customGetImageSrc = function( slideOpts, opts, slideEl ) {
+						return jQuery( slideEl ).find('img').attr('src');
+					},
+					// add a new method to the C2 API:
+					API.customGetImageClass = function( slideOpts, opts, slideEl ) {
+						return jQuery( slideEl ).attr('class');
+					}
+				});
+				
+				// Run Slideshow
+				/*
+				jQuery('#fancy-slideshow-<?php echo $number ?>').cycle({
+					fx: '<?php echo $instance['fade']; ?>',
+					timeout: <?php echo (float)$instance['timeout'] * 1000; ?>,
+					next: '#fancy-slideshow-<?php echo $number ?>-next',
+					prev: '#fancy-slideshow-<?php echo $number ?>-prev',
+					speed: <?php echo (float)$instance['speed'] * 1000; ?>,
+					random: <?php echo intval($instance['order']); ?>,
+					pager: '#fancy-slideshow-nav-<?php echo $number ?>',
+					pause: 1,
+					resume: 1,
+					// callback fn that creates a thumbnail to use as pager anchor 
+					pagerAnchorBuilder: function(idx, slide) {
+						<?php if ( $instance['navigation_pager'] == "thumbs" ) : ?>
+						return '<a href="#" style="width: <?php echo 100/$num_slides ?>%;" class="' + jQuery(slide).attr('class') + '"><img src="' + jQuery(slide).find('img').attr('src') + '" style="width: <?php echo (100/$num_slides)-1 ?>%; margin: 0 <?php echo $mar_thumbs ?>%;" /></a>';
+						<?php endif; ?>
+						
+						<?php if ( $instance['navigation_pager'] == "buttons" ) : ?>
+						return '<a href="#"></a>';
+						<?php endif; ?>
+					},
+				});
+				*/
+			</script>
+			<?php
+			$out = ob_get_contents();
+			ob_end_clean();
+			return $out;
+	}
+	
+	
+	/**
 	 * redefine Links widget arguments to exclude chosen link category
 	 *
 	 * @param $args
@@ -667,10 +1089,11 @@ class SponsorsSlideshowWidget extends WP_Widget
 		$excludes = array();
 		if (count($options) > 0) {
 			foreach ( (array)$options AS $option ) {
+				$cat = explode("_", $option['category']);
+				$option["source"] = $cat[0];
 				// exclude only categories from links source
 				if ( $option['source'] == 'links' ) {
-					$cat = explode("_", $option['category']);
-					$excludes[] = $cat[2];
+					$excludes[] = $cat[3];
 				}
 			}
 			
@@ -693,11 +1116,12 @@ class SponsorsSlideshowWidget extends WP_Widget
 		$excludes = array();
 		if (count($options) > 0) {
 			foreach ( (array)$options AS $option ) {
+				$cat = explode("_", $option['category']);
+				$option["source"] = $cat[0];
 				// exclude categories from widget only if source is images
 				if ($option['source'] == 'images') {
-					$cat = explode("_", $option['category']);
-					if ( isset($cat[1]) && !in_array($cat[1], $excludes) )
-						$excludes[] = $cat[1];
+					if ( isset($cat[2]) && !in_array($cat[2], $excludes) )
+						$excludes[] = $cat[2];
 				}
 			}
 			
@@ -721,13 +1145,14 @@ class SponsorsSlideshowWidget extends WP_Widget
 		$num = array();
 		if (count($options) > 0) {
 			foreach ($options AS $option) {
+				$cat = explode("_", $option['category']);
+				$option["source"] = $cat[0];
 				if ($option['source'] == 'posts') {
-					$cat = explode("_", $option['category']);
 					// Exclude n latest posts or posts from selected category
-					if ($cat[0] == 'latest') {
-						$num[] = intval($cat[1]);
+					if ($cat[1] == 'latest') {
+						$num[] = intval($cat[2]);
 					} else {
-						$cat_ids[] = "-".$cat[1];
+						$cat_ids[] = "-".$cat[2];
 					}
 				}
 			}
@@ -745,13 +1170,19 @@ class SponsorsSlideshowWidget extends WP_Widget
 	
 	
 	/**
-	  * Enable categories in attachments
-	  *
-	  * @param none
-	  * @return void
-	  */
-	function addCategoriesToAttachments() {
-		 register_taxonomy_for_object_type( 'category', 'attachment' );  
+	 * retrieve base url from string
+	 *
+	 * @param string $url
+	 * @return string
+	 */
+	function getBaseURL( $url )
+	{
+		preg_match("/^https?:\/\/(.+?)\/.+/", $url, $matches);
+		
+		if ( isset($matches[1]) )
+			return $matches[1];
+		
+		return false;
 	}
 	
 	
@@ -795,6 +1226,65 @@ class SponsorsSlideshowWidget extends WP_Widget
 		require_once( $this->plugin_path . '/tinymce/window.php' );
 		exit;
 	}
+	
+	/**
+	 * add post meta box
+	 *
+	 */
+	function addMetaboxPost()
+	{
+		add_meta_box( 'fancy-slideshow', __('Slideshow Overlay','sponsors-slideshow'), array(&$this, 'displayMetabox'), 'post' );
+	}
+	/**
+	 * add page meta box
+	 *
+	 */
+	function addMetaboxPage()
+	{
+		add_meta_box( 'fancy-slideshow', __('Slideshow Overlay','sponsors-slideshow'), array(&$this, 'displayMetabox'), 'page' );
+	}
+	
+	/**
+	 * diplay post/page meta box
+	 *
+	 * @param object $post
+	 */
+	function displayMetabox( $post )
+	{
+		global $post_ID;
+		
+		if ( $post->ID != 0 ) {
+			$slide_title = stripslashes(get_post_meta( $post->ID, 'fancy_slideshow_overlay_title', true ));
+			$slide_description = stripslashes(get_post_meta( $post->ID, 'fancy_slideshow_overlay_description', true ));
+		} else {
+			$slide_title = "";
+			$slide_description = "";
+		}
+		
+		echo "<div class='fancy-slideshow-post-meta'>";
+		echo "<p><label for='fancy_slideshow_overlay_title'>".__( 'Title', 'sponsors-slideshow' )."</label><input type='text' name='fancy_slideshow_overlay_title' id='fancy_slideshow_overlay_title' value='".$slide_title."' /></p>";
+		echo "<p><label for='fancy_slideshow_overlay_description'>".__( 'Description', 'sponsors-slideshow' )."</label><textarea rows='4' name='fancy_slideshow_overlay_description' id='fancy_slideshow_overlay_description'>".$slide_description."</textarea></p>";
+		echo "<p>".__( 'These slideshow overlay settings are optional. If empty, the post/page title and excerpt will be used as overlay', 'sponsors-slideshow' )."</p>";
+		echo "</div>";
+	}
+	
+	
+	/**
+	 * edit post/page meta data
+	 *
+	 * @param
+	 */
+	function editPostMeta()
+	{
+		if (isset($_POST['post_ID'])) {
+			$post_ID = intval($_POST['post_ID']);
+			$slide_title = htmlspecialchars(strip_shortcodes(strip_tags($_POST['fancy_slideshow_overlay_title'])));
+			$slide_description = htmlspecialchars(strip_shortcodes(strip_tags($_POST['fancy_slideshow_overlay_description'])));
+			
+			update_post_meta( $post_ID, 'fancy_slideshow_overlay_title', $slide_title );
+			update_post_meta( $post_ID, 'fancy_slideshow_overlay_description', $slide_description );
+		}
+	}
 }
 // Run SponsorsSlideshowWidget
 function sponsors_slideshow_widget_init() {
@@ -825,6 +1315,10 @@ add_action('widgets_init', 'sponsors_slideshow_widget_init');
  * - show_pager: 0 or 1 to control display of pager navigation
  */
 function sponsors_slideshow_widget_display( $args = array(), $instance = array() ) {
+	$sponsors_slideshow_widget = new SponsorsSlideshowWidget();
+	$sponsors_slideshow_widget->widget( $args, $instance );
+}
+function fancy_slideshow( $args = array(), $instance = array() ) {
 	$sponsors_slideshow_widget = new SponsorsSlideshowWidget();
 	$sponsors_slideshow_widget->widget( $args, $instance );
 }
